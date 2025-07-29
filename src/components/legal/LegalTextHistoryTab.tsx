@@ -34,6 +34,8 @@ import {
   Star,
   Users
 } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface LegalTextVersion {
   id: string;
@@ -211,6 +213,17 @@ export function LegalTextHistoryTab() {
     
     return matchesSearch && matchesTextType && matchesModificationType && matchesStatus && matchesSector;
   });
+
+  // Pagination sur les versions filtrées
+  const {
+    currentData: paginatedVersions,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({ data: filteredVersions, itemsPerPage: 10 });
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -438,7 +451,7 @@ export function LegalTextHistoryTab() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredVersions.map((version) => (
+            {paginatedVersions.map((version) => (
               <div key={version.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4 flex-1">
@@ -550,16 +563,18 @@ export function LegalTextHistoryTab() {
               </div>
             ))}
           </div>
-
-          {filteredVersions.length === 0 && (
-            <div className="text-center py-12">
-              <History className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-500 mb-2">Aucune version trouvée</h3>
-              <p className="text-gray-400">Essayez de modifier vos critères de recherche</p>
-            </div>
-          )}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
+          </div>
         </CardContent>
-            </Card>
+      </Card>
       
       {/* Modales fonctionnelles */}
       {modals.documentView.document && (
