@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { BookOpen, Languages, FileText, Search } from 'lucide-react';
 import { AddDictionaryTermForm } from '@/components/forms/AddDictionaryTermForm';
 import { EnrichDictionaryForm } from '@/components/forms/EnrichDictionaryForm';
@@ -48,6 +50,48 @@ export function DictionariesSection() {
   const handleCloseEnrichGlossaryForm = () => {
     setShowEnrichGlossaryForm(false);
   };
+
+  // Données d'exemple pour les dictionnaires
+  const dictionaryTerms = [
+    { id: 1, term: "Contrat", definition: "Convention par laquelle une ou plusieurs personnes s'obligent envers une ou plusieurs autres à donner, à faire ou à ne pas faire quelque chose.", domain: "Droit civil", frequency: "Fréquent" },
+    { id: 2, term: "Tribunal", definition: "Juridiction chargée de rendre la justice, composée d'un ou plusieurs magistrats.", domain: "Organisation judiciaire", frequency: "Essentiel" },
+    { id: 3, term: "Jurisprudence", definition: "Ensemble des décisions rendues par les tribunaux et qui constituent une source du droit.", domain: "Sources du droit", frequency: "Avancé" },
+  ];
+
+  const glossaryTerms = [
+    { id: 1, term: "Appel", definition: "Voie de recours ordinaire contre les jugements rendus en première instance par les tribunaux.", domain: "Procédure", frequency: "Essentiel" },
+    { id: 2, term: "Cassation", definition: "Recours devant la Cour suprême contre les arrêts des cours d'appel pour violation de la loi.", domain: "Procédure", frequency: "Avancé" },
+    { id: 3, term: "Prescription", definition: "Extinction d'un droit par l'écoulement du temps ou acquisition d'un droit par possession prolongée.", domain: "Droit civil", frequency: "Fréquent" },
+    { id: 4, term: "Nullité", definition: "Sanction frappant un acte juridique qui ne remplit pas les conditions requises pour sa validité.", domain: "Droit général", frequency: "Important" },
+  ];
+
+  // Pagination pour les termes du dictionnaire français-arabe
+  const {
+    currentData: paginatedDictionaryTerms,
+    currentPage: dictCurrentPage,
+    totalPages: dictTotalPages,
+    itemsPerPage: dictItemsPerPage,
+    totalItems: dictTotalItems,
+    setCurrentPage: setDictCurrentPage,
+    setItemsPerPage: setDictItemsPerPage
+  } = usePagination({
+    data: dictionaryTerms,
+    itemsPerPage: 10
+  });
+
+  // Pagination pour les termes du glossaire
+  const {
+    currentData: paginatedGlossaryTerms,
+    currentPage: glossCurrentPage,
+    totalPages: glossTotalPages,
+    itemsPerPage: glossItemsPerPage,
+    totalItems: glossTotalItems,
+    setCurrentPage: setGlossCurrentPage,
+    setItemsPerPage: setGlossItemsPerPage
+  } = usePagination({
+    data: glossaryTerms,
+    itemsPerPage: 10
+  });
 
   return (
     <div className="space-y-6">
@@ -132,49 +176,35 @@ export function DictionariesSection() {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                      <div className="font-medium text-sm flex justify-between">
-                        <span>Contrat</span>
-                        <span className="text-blue-600">عقد</span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">Convention par laquelle une ou plusieurs personnes s'obligent envers une ou plusieurs autres à donner, à faire ou à ne pas faire quelque chose.</p>
-                      <div className="flex gap-1 mt-2">
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Droit civil</span>
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Fréquent</span>
-                      </div>
-                    </div>
-                    <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                      <div className="font-medium text-sm flex justify-between">
-                        <span>Tribunal</span>
-                        <span className="text-blue-600">محكمة</span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">Juridiction chargée de rendre la justice, composée d'un ou plusieurs magistrats.</p>
-                      <div className="flex gap-1 mt-2">
-                        <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Organisation judiciaire</span>
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Essentiel</span>
-                      </div>
-                    </div>
-                    <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                      <div className="font-medium text-sm flex justify-between">
-                        <span>Jurisprudence</span>
-                        <span className="text-blue-600">اجتهاد قضائي</span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">Ensemble des décisions rendues par les tribunaux et qui constituent une source du droit.</p>
-                      <div className="flex gap-1 mt-2">
-                        <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Sources du droit</span>
-                        <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Avancé</span>
-                      </div>
-                    </div>
+                  {/* Liste des termes du dictionnaire avec pagination */}
+                  <div className="space-y-4">
+                    {paginatedDictionaryTerms.map((term) => (
+                      <Card key={term.id} className="hover:shadow-lg transition-shadow">
+                        <div className="font-medium text-sm flex justify-between">
+                          <span>{term.term}</span>
+                          <span className="text-blue-600">{term.definition}</span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1">
+                          <strong>Définition:</strong> {term.definition}
+                        </p>
+                        <div className="flex gap-1 mt-2">
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Domaine: {term.domain}</span>
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Fréquence: {term.frequency}</span>
+                        </div>
+                      </Card>
+                    ))}
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <Button className="flex-1">
-                      Consulter le dictionnaire complet
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Search className="w-4 h-4" />
-                    </Button>
+
+                  {/* Pagination pour le dictionnaire */}
+                  <div className="mt-6">
+                    <Pagination
+                      currentPage={dictCurrentPage}
+                      totalPages={dictTotalPages}
+                      totalItems={dictTotalItems}
+                      itemsPerPage={dictItemsPerPage}
+                      onPageChange={setDictCurrentPage}
+                      onItemsPerPageChange={setDictItemsPerPage}
+                    />
                   </div>
                 </CardContent>
             </Card>
@@ -302,45 +332,30 @@ export function DictionariesSection() {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                    <div className="font-medium text-sm text-blue-700">Appel</div>
-                    <p className="text-xs text-gray-600 mt-1">Voie de recours ordinaire contre les jugements rendus en première instance par les tribunaux.</p>
-                    <div className="flex gap-1 mt-2">
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Procédure</span>
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Essentiel</span>
-                    </div>
-                  </div>
-                  <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                    <div className="font-medium text-sm text-red-700">Cassation</div>
-                    <p className="text-xs text-gray-600 mt-1">Recours devant la Cour suprême contre les arrêts des cours d'appel pour violation de la loi.</p>
-                    <div className="flex gap-1 mt-2">
-                      <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Procédure</span>
-                      <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">Avancé</span>
-                    </div>
-                  </div>
-                  <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                    <div className="font-medium text-sm text-green-700">Prescription</div>
-                    <p className="text-xs text-gray-600 mt-1">Extinction d'un droit par l'écoulement du temps ou acquisition d'un droit par possession prolongée.</p>
-                    <div className="flex gap-1 mt-2">
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Droit civil</span>
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Fréquent</span>
-                    </div>
-                  </div>
-                  <div className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
-                    <div className="font-medium text-sm text-purple-700">Nullité</div>
-                    <p className="text-xs text-gray-600 mt-1">Sanction frappant un acte juridique qui ne remplit pas les conditions requises pour sa validité.</p>
-                    <div className="flex gap-1 mt-2">
-                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Droit général</span>
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Important</span>
-                    </div>
-                  </div>
+                {/* Liste des termes du glossaire avec pagination */}
+                <div className="space-y-4">
+                  {paginatedGlossaryTerms.map((term) => (
+                    <Card key={term.id} className="hover:shadow-lg transition-shadow">
+                      <div className="font-medium text-sm text-blue-700">Appel</div>
+                      <p className="text-xs text-gray-600 mt-1">Voie de recours ordinaire contre les jugements rendus en première instance par les tribunaux.</p>
+                      <div className="flex gap-1 mt-2">
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Procédure</span>
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Essentiel</span>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
-                
-                <div className="mt-4 pt-4 border-t">
-                  <Button className="w-full">
-                    Consulter le glossaire complet
-                  </Button>
+
+                {/* Pagination pour le glossaire */}
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={glossCurrentPage}
+                    totalPages={glossTotalPages}
+                    totalItems={glossTotalItems}
+                    itemsPerPage={glossItemsPerPage}
+                    onPageChange={setGlossCurrentPage}
+                    onItemsPerPageChange={setGlossItemsPerPage}
+                  />
                 </div>
               </CardContent>
             </Card>
