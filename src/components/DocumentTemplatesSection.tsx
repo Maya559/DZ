@@ -18,6 +18,8 @@ import { NewTemplateModal } from '@/components/modals/NewTemplateModal';
 import { DocumentViewerModal } from '@/components/modals/DocumentViewerModal';
 import { DocumentTemplatesModal } from '@/components/modals/DocumentTemplatesModal';
 import { CollaborativeEditorModal } from '@/components/modals/CollaborativeEditorModal';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function DocumentTemplatesSection() {
   // Ajout de l'état pour les modales métier
@@ -97,6 +99,20 @@ export function DocumentTemplatesSection() {
     orange: "bg-orange-100 text-orange-600"
   };
 
+  // Pagination pour les catégories de modèles
+  const {
+    currentData: paginatedCategories,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: categories,
+    itemsPerPage: 4
+  });
+
   return (
     <div className="space-y-8">
       {/* Modale de visualisation de modèles */}
@@ -126,13 +142,13 @@ export function DocumentTemplatesSection() {
           onClose={() => setShowCollaborativeEditor(false)}
         />
       )}
-      {/* Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {categories.map((category, index) => {
+      {/* Catégories de modèles avec pagination */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {paginatedCategories.map((category, index) => {
           const IconComponent = category.icon;
           
           return (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
+            <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[category.color as keyof typeof colorClasses]}`}>
@@ -158,6 +174,18 @@ export function DocumentTemplatesSection() {
             </Card>
           );
         })}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Features */}

@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Upload, FileText, Download, Eye, Wand2, CheckCircle2, AlertCircle, Share2 } from 'lucide-react';
 import { DocumentViewerModal } from '@/components/modals/DocumentViewerModal';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function DataExtractionSection() {
   // États pour les modales métier
@@ -37,6 +39,20 @@ export function DataExtractionSection() {
       processingTime: "2 min 15s"
     }
   ];
+
+  // Pagination pour les extractions récentes
+  const {
+    currentData: paginatedExtractions,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: recentExtractions,
+    itemsPerPage: 5
+  });
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -226,15 +242,18 @@ export function DataExtractionSection() {
         </Card>
       </div>
 
-      {/* Recent Extractions */}
+      {/* Extractions récentes avec pagination */}
       <Card>
         <CardHeader>
-          <CardTitle>Extractions récentes</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-blue-600" />
+            Extractions récentes
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentExtractions.map((extraction) => (
-              <div key={extraction.id} className="flex items-center justify-between p-4 border rounded-lg">
+            {paginatedExtractions.map((extraction) => (
+              <div key={extraction.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <FileText className="w-5 h-5 text-green-600" />
@@ -285,6 +304,16 @@ export function DataExtractionSection() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
         </CardContent>
       </Card>
