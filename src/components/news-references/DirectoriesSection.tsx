@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Building, MapPin, Phone, Mail, Globe, Users, Gavel, Scale, Plus, Upload, Search, Filter, Download, ExternalLink } from 'lucide-react';
 
 export function DirectoriesSection() {
@@ -206,6 +208,62 @@ export function DirectoriesSection() {
       icon: <Scale className="w-8 h-8 text-red-600" />
     }
   ];
+
+  // Pagination pour les institutions
+  const {
+    currentData: paginatedInstitutions,
+    currentPage: instCurrentPage,
+    totalPages: instTotalPages,
+    itemsPerPage: instItemsPerPage,
+    totalItems: instTotalItems,
+    setCurrentPage: setInstCurrentPage,
+    setItemsPerPage: setInstItemsPerPage
+  } = usePagination({
+    data: institutionsData,
+    itemsPerPage: 6
+  });
+
+  // Pagination pour les facultés
+  const {
+    currentData: paginatedFacultes,
+    currentPage: facCurrentPage,
+    totalPages: facTotalPages,
+    itemsPerPage: facItemsPerPage,
+    totalItems: facTotalItems,
+    setCurrentPage: setFacCurrentPage,
+    setItemsPerPage: setFacItemsPerPage
+  } = usePagination({
+    data: facultesData,
+    itemsPerPage: 6
+  });
+
+  // Pagination pour les professionnels
+  const {
+    currentData: paginatedProfessionnels,
+    currentPage: profCurrentPage,
+    totalPages: profTotalPages,
+    itemsPerPage: profItemsPerPage,
+    totalItems: profTotalItems,
+    setCurrentPage: setProfCurrentPage,
+    setItemsPerPage: setProfItemsPerPage
+  } = usePagination({
+    data: professionnelsData,
+    itemsPerPage: 6
+  });
+
+  // Pagination pour les organismes
+  const {
+    currentData: paginatedOrganismes,
+    currentPage: orgCurrentPage,
+    totalPages: orgTotalPages,
+    itemsPerPage: orgItemsPerPage,
+    totalItems: orgTotalItems,
+    setCurrentPage: setOrgCurrentPage,
+    setItemsPerPage: setOrgItemsPerPage
+  } = usePagination({
+    data: organismesData,
+    itemsPerPage: 6
+  });
 
   const handleAdd = (type: string) => {
     console.log(`Opening add form for: ${type}`);
@@ -460,7 +518,118 @@ export function DirectoriesSection() {
             </Card>
           </div>
 
-          {renderDirectoryCards(institutionsData)}
+          {/* Liste des institutions avec pagination */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedInstitutions.map((institution) => (
+              <Card key={institution.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {institution.icon}
+                      <div>
+                        <CardTitle className="text-lg">{institution.name}</CardTitle>
+                        <Badge variant="secondary" className="mt-1">
+                          {institution.type}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <CardDescription>{institution.description}</CardDescription>
+                  
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{institution.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      <button 
+                        onClick={() => handlePhoneClick(institution.phone)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {institution.phone}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleEmailClick(institution.email)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {institution.email}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleWebsiteClick(institution.website)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {institution.website}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Actions directes enrichies */}
+                  <div className="flex gap-2 pt-3 border-t">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handlePhoneClick(institution.phone)}
+                      className="flex-1"
+                    >
+                      <Phone className="w-3 h-3 mr-1" />
+                      Appeler
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEmailClick(institution.email)}
+                      className="flex-1"
+                    >
+                      <Mail className="w-3 h-3 mr-1" />
+                      Email
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleWebsiteClick(institution.website)}
+                      className="flex-1"
+                    >
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      Site
+                    </Button>
+                  </div>
+
+                  {/* Modal détaillé */}
+                  <Button 
+                    size="sm" 
+                    className="w-full mt-2"
+                    onClick={() => {
+                      // Ouvrir modal avec détails complets
+                      console.log('Ouvrir modal détaillé pour:', institution.name);
+                    }}
+                  >
+                    Voir les détails complets
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination pour les institutions */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={instCurrentPage}
+              totalPages={instTotalPages}
+              totalItems={instTotalItems}
+              itemsPerPage={instItemsPerPage}
+              onPageChange={setInstCurrentPage}
+              onItemsPerPageChange={setInstItemsPerPage}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="facultes" className="mt-6">
@@ -470,12 +639,234 @@ export function DirectoriesSection() {
 
         <TabsContent value="professionnels" className="mt-6">
           {renderTabButtons('professionnels')}
-          {renderDirectoryCards(professionnelsData)}
+          {/* Liste des professionnels avec pagination */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedProfessionnels.map((professionnel) => (
+              <Card key={professionnel.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {professionnel.icon}
+                      <div>
+                        <CardTitle className="text-lg">{professionnel.name}</CardTitle>
+                        <Badge variant="secondary" className="mt-1">
+                          {professionnel.type}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <CardDescription>{professionnel.description}</CardDescription>
+                  
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{professionnel.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      <button 
+                        onClick={() => handlePhoneClick(professionnel.phone)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {professionnel.phone}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleEmailClick(professionnel.email)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {professionnel.email}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleWebsiteClick(professionnel.website)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {professionnel.website}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Actions directes enrichies */}
+                  <div className="flex gap-2 pt-3 border-t">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handlePhoneClick(professionnel.phone)}
+                      className="flex-1"
+                    >
+                      <Phone className="w-3 h-3 mr-1" />
+                      Appeler
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEmailClick(professionnel.email)}
+                      className="flex-1"
+                    >
+                      <Mail className="w-3 h-3 mr-1" />
+                      Email
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleWebsiteClick(professionnel.website)}
+                      className="flex-1"
+                    >
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      Site
+                    </Button>
+                  </div>
+
+                  {/* Modal détaillé */}
+                  <Button 
+                    size="sm" 
+                    className="w-full mt-2"
+                    onClick={() => {
+                      // Ouvrir modal avec détails complets
+                      console.log('Ouvrir modal détaillé pour:', professionnel.name);
+                    }}
+                  >
+                    Voir les détails complets
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination pour les professionnels */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={profCurrentPage}
+              totalPages={profTotalPages}
+              totalItems={profTotalItems}
+              itemsPerPage={profItemsPerPage}
+              onPageChange={setProfCurrentPage}
+              onItemsPerPageChange={setProfItemsPerPage}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="organismes" className="mt-6">
           {renderTabButtons('organismes')}
-          {renderDirectoryCards(organismesData)}
+          {/* Liste des organismes avec pagination */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedOrganismes.map((organisme) => (
+              <Card key={organisme.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {organisme.icon}
+                      <div>
+                        <CardTitle className="text-lg">{organisme.name}</CardTitle>
+                        <Badge variant="secondary" className="mt-1">
+                          {organisme.type}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <CardDescription>{organisme.description}</CardDescription>
+                  
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{organisme.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      <button 
+                        onClick={() => handlePhoneClick(organisme.phone)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {organisme.phone}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleEmailClick(organisme.email)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {organisme.email}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleWebsiteClick(organisme.website)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {organisme.website}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Actions directes enrichies */}
+                  <div className="flex gap-2 pt-3 border-t">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handlePhoneClick(organisme.phone)}
+                      className="flex-1"
+                    >
+                      <Phone className="w-3 h-3 mr-1" />
+                      Appeler
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEmailClick(organisme.email)}
+                      className="flex-1"
+                    >
+                      <Mail className="w-3 h-3 mr-1" />
+                      Email
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleWebsiteClick(organisme.website)}
+                      className="flex-1"
+                    >
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      Site
+                    </Button>
+                  </div>
+
+                  {/* Modal détaillé */}
+                  <Button 
+                    size="sm" 
+                    className="w-full mt-2"
+                    onClick={() => {
+                      // Ouvrir modal avec détails complets
+                      console.log('Ouvrir modal détaillé pour:', organisme.name);
+                    }}
+                  >
+                    Voir les détails complets
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination pour les organismes */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={orgCurrentPage}
+              totalPages={orgTotalPages}
+              totalItems={orgTotalItems}
+              itemsPerPage={orgItemsPerPage}
+              onPageChange={setOrgCurrentPage}
+              onItemsPerPageChange={setOrgItemsPerPage}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
