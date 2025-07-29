@@ -21,6 +21,8 @@ import {
   ArrowDown,
   Minus
 } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function TrendsAnalysis() {
   const [selectedPeriod, setSelectedPeriod] = useState('3-months');
@@ -169,6 +171,40 @@ export function TrendsAnalysis() {
     }
   };
 
+  // Filtrage des sujets tendance
+  const filteredTrendingTopics = trendingTopics.filter(topic =>
+    topic.topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    topic.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination pour les sujets tendance
+  const {
+    currentData: paginatedTrendingTopics,
+    currentPage: trendingPage,
+    totalPages: trendingTotalPages,
+    itemsPerPage: trendingItemsPerPage,
+    totalItems: trendingTotalItems,
+    setCurrentPage: setTrendingPage,
+    setItemsPerPage: setTrendingItemsPerPage
+  } = usePagination({
+    data: filteredTrendingTopics,
+    itemsPerPage: 5
+  });
+
+  // Pagination pour les tendances émergentes
+  const {
+    currentData: paginatedEmergingTrends,
+    currentPage: emergingPage,
+    totalPages: emergingTotalPages,
+    itemsPerPage: emergingItemsPerPage,
+    totalItems: emergingTotalItems,
+    setCurrentPage: setEmergingPage,
+    setItemsPerPage: setEmergingItemsPerPage
+  } = usePagination({
+    data: emergingTrends,
+    itemsPerPage: 5
+  });
+
   return (
     <div className="space-y-6">
       {/* Filtres et recherche */}
@@ -235,72 +271,84 @@ export function TrendsAnalysis() {
           <TabsTrigger value="predictions">Prédictions</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="trending">
-          <div className="grid gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
-                  Sujets les plus tendance (3 derniers mois)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {trendingTopics.map((trend) => (
-                    <div key={trend.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+        {/* Sujets tendance avec pagination */}
+        <TabsContent value="trending" className="space-y-4">
+          <div className="space-y-4">
+            {paginatedTrendingTopics.map((topic) => (
+              <Card key={topic.id} className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    {topic.topic}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-gray-900">{trend.topic}</h4>
-                            <Badge variant="secondary">{trend.category}</Badge>
-                            <div className={`flex items-center gap-1 px-2 py-1 rounded-full border ${getStatusColor(trend.status)}`}>
-                              {getStatusIcon(trend.status)}
+                            <h4 className="font-semibold text-gray-900">{topic.topic}</h4>
+                            <Badge variant="secondary">{topic.category}</Badge>
+                            <div className={`flex items-center gap-1 px-2 py-1 rounded-full border ${getStatusColor(topic.status)}`}>
+                              {getStatusIcon(topic.status)}
                               <span className="text-xs font-medium">
-                                {trend.growth > 0 ? '+' : ''}{trend.growth}%
+                                {topic.growth > 0 ? '+' : ''}{topic.growth}%
                               </span>
                             </div>
                           </div>
-                          <p className="text-sm text-gray-600 mb-3">{trend.description}</p>
+                          <p className="text-sm text-gray-600 mb-3">{topic.description}</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div className="flex items-center gap-2">
                           <Search className="w-4 h-4 text-blue-600" />
                           <span className="text-gray-600">Recherches:</span>
-                          <span className="font-medium">{trend.searches.toLocaleString()}</span>
+                          <span className="font-medium">{topic.searches.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-purple-600" />
                           <span className="text-gray-600">Documents:</span>
-                          <span className="font-medium">{trend.documents}</span>
+                          <span className="font-medium">{topic.documents}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <BarChart3 className="w-4 h-4 text-green-600" />
                           <span className="text-gray-600">Croissance:</span>
-                          <span className="font-medium">{trend.growth > 0 ? '+' : ''}{trend.growth}%</span>
+                          <span className="font-medium">{topic.growth > 0 ? '+' : ''}{topic.growth}%</span>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={trendingPage}
+              totalPages={trendingTotalPages}
+              totalItems={trendingTotalItems}
+              itemsPerPage={trendingItemsPerPage}
+              onPageChange={setTrendingPage}
+              onItemsPerPageChange={setTrendingItemsPerPage}
+            />
           </div>
         </TabsContent>
 
-        <TabsContent value="emerging">
-          <div className="grid gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-orange-600" />
-                  Tendances émergentes à surveiller
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {emergingTrends.map((trend, index) => (
-                    <div key={index} className="border rounded-lg p-4">
+        {/* Tendances émergentes avec pagination */}
+        <TabsContent value="emerging" className="space-y-4">
+          <div className="space-y-4">
+            {paginatedEmergingTrends.map((trend, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-orange-600" />
+                    {trend.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -325,10 +373,20 @@ export function TrendsAnalysis() {
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={emergingPage}
+              totalPages={emergingTotalPages}
+              totalItems={emergingTotalItems}
+              itemsPerPage={emergingItemsPerPage}
+              onPageChange={setEmergingPage}
+              onItemsPerPageChange={setEmergingItemsPerPage}
+            />
           </div>
         </TabsContent>
 

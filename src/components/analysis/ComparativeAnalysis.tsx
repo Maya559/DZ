@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GitCompareArrows, Play, TrendingUp, TrendingDown, Calendar, Users, BarChart3, PieChart, FileText, Clock, Filter, Download } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, PieChart as RechartsPieChart, Cell, AreaChart, Area } from 'recharts';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 const comparisonData = [
   { metric: 'Performance', periode1: 85, periode2: 92, difference: 7 },
@@ -71,6 +73,34 @@ export function ComparativeAnalysis() {
     'Taux de succès': true,
     'Volume de documents': true,
     'Fréquence d\'accès': true
+  });
+
+  // Pagination pour les données de comparaison
+  const {
+    currentData: paginatedComparisonData,
+    currentPage: comparisonPage,
+    totalPages: comparisonTotalPages,
+    itemsPerPage: comparisonItemsPerPage,
+    totalItems: comparisonTotalItems,
+    setCurrentPage: setComparisonPage,
+    setItemsPerPage: setComparisonItemsPerPage
+  } = usePagination({
+    data: comparisonData,
+    itemsPerPage: 5
+  });
+
+  // Pagination pour les données de tendances
+  const {
+    currentData: paginatedTrendData,
+    currentPage: trendPage,
+    totalPages: trendTotalPages,
+    itemsPerPage: trendItemsPerPage,
+    totalItems: trendTotalItems,
+    setCurrentPage: setTrendPage,
+    setItemsPerPage: setTrendItemsPerPage
+  } = usePagination({
+    data: trendData,
+    itemsPerPage: 6
   });
 
   const handleMetricChange = (metric: string, checked: boolean) => {
