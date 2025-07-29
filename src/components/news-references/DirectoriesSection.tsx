@@ -634,7 +634,119 @@ export function DirectoriesSection() {
 
         <TabsContent value="facultes" className="mt-6">
           {renderTabButtons('facultes')}
-          {renderDirectoryCards(facultesData)}
+          
+          {/* Liste des facultés avec pagination */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedFacultes.map((faculte) => (
+              <Card key={faculte.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {faculte.icon}
+                      <div>
+                        <CardTitle className="text-lg">{faculte.name}</CardTitle>
+                        <Badge variant="secondary" className="mt-1">
+                          {faculte.type}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <CardDescription>{faculte.description}</CardDescription>
+                  
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{faculte.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      <button 
+                        onClick={() => handlePhoneClick(faculte.phone)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {faculte.phone}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleEmailClick(faculte.email)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {faculte.email}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleWebsiteClick(faculte.website)}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {faculte.website}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Actions directes enrichies */}
+                  <div className="flex gap-2 pt-3 border-t">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handlePhoneClick(faculte.phone)}
+                      className="flex-1"
+                    >
+                      <Phone className="w-3 h-3 mr-1" />
+                      Appeler
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEmailClick(faculte.email)}
+                      className="flex-1"
+                    >
+                      <Mail className="w-3 h-3 mr-1" />
+                      Email
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleWebsiteClick(faculte.website)}
+                      className="flex-1"
+                    >
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      Site
+                    </Button>
+                  </div>
+
+                  {/* Modal détaillé */}
+                  <Button 
+                    size="sm" 
+                    className="w-full mt-2"
+                    onClick={() => {
+                      // Ouvrir modal avec détails complets
+                      console.log('Ouvrir modal détaillé pour:', faculte.name);
+                    }}
+                  >
+                    Voir les détails complets
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination pour les facultés */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={facCurrentPage}
+              totalPages={facTotalPages}
+              totalItems={facTotalItems}
+              itemsPerPage={facItemsPerPage}
+              onPageChange={setFacCurrentPage}
+              onItemsPerPageChange={setFacItemsPerPage}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="professionnels" className="mt-6">

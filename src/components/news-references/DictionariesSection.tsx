@@ -176,24 +176,24 @@ export function DictionariesSection() {
                     </div>
                   </div>
 
-                  {/* Liste des termes du dictionnaire avec pagination */}
-                  <div className="space-y-4">
-                    {paginatedDictionaryTerms.map((term) => (
-                      <Card key={term.id} className="hover:shadow-lg transition-shadow">
-                        <div className="font-medium text-sm flex justify-between">
-                          <span>{term.term}</span>
-                          <span className="text-blue-600">{term.definition}</span>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-1">
-                          <strong>Définition:</strong> {term.definition}
-                        </p>
-                        <div className="flex gap-1 mt-2">
-                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Domaine: {term.domain}</span>
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Fréquence: {term.frequency}</span>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
+                                     {/* Liste des termes du dictionnaire avec pagination */}
+                   <div className="space-y-4">
+                     {paginatedDictionaryTerms.map((term) => (
+                       <div key={term.id} className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
+                         <div className="font-medium text-sm flex justify-between">
+                           <span>{term.term}</span>
+                           <span className="text-blue-600">عربي</span>
+                         </div>
+                         <p className="text-xs text-gray-600 mt-1">
+                           <strong>Définition:</strong> {term.definition}
+                         </p>
+                         <div className="flex gap-1 mt-2">
+                           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Domaine: {term.domain}</span>
+                           <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Fréquence: {term.frequency}</span>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
 
                   {/* Pagination pour le dictionnaire */}
                   <div className="mt-6">
@@ -332,19 +332,19 @@ export function DictionariesSection() {
                   </div>
                 </div>
 
-                {/* Liste des termes du glossaire avec pagination */}
-                <div className="space-y-4">
-                  {paginatedGlossaryTerms.map((term) => (
-                    <Card key={term.id} className="hover:shadow-lg transition-shadow">
-                      <div className="font-medium text-sm text-blue-700">Appel</div>
-                      <p className="text-xs text-gray-600 mt-1">Voie de recours ordinaire contre les jugements rendus en première instance par les tribunaux.</p>
-                      <div className="flex gap-1 mt-2">
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Procédure</span>
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Essentiel</span>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
+                                 {/* Liste des termes du glossaire avec pagination */}
+                 <div className="space-y-4">
+                   {paginatedGlossaryTerms.map((term) => (
+                     <div key={term.id} className="p-3 border rounded hover:bg-gray-50 cursor-pointer">
+                       <div className="font-medium text-sm text-blue-700">{term.term}</div>
+                       <p className="text-xs text-gray-600 mt-1">{term.definition}</p>
+                       <div className="flex gap-1 mt-2">
+                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{term.domain}</span>
+                         <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">{term.frequency}</span>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
 
                 {/* Pagination pour le glossaire */}
                 <div className="mt-6">
