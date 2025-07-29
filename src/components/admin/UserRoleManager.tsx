@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Users, Shield, RefreshCw } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface UserProfile {
   id: string;
@@ -24,6 +26,20 @@ export function UserRoleManager() {
   const { toast } = useToast();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination pour les utilisateurs
+  const {
+    currentData: paginatedUsers,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: users,
+    itemsPerPage: 10
+  });
 
   useEffect(() => {
     if (userRole === 'admin') {
@@ -176,44 +192,60 @@ export function UserRoleManager() {
           </div>
         ) : (
           <div className="space-y-4">
-            {users.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex-1">
-                  <div className="font-medium">
-                    {user.first_name || user.last_name 
-                      ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
-                      : 'Nom non renseigné'
-                    }
+            {paginatedUsers.map((user) => (
+              <Card key={user.id} className="p-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="font-medium">
+                      {user.first_name || user.last_name 
+                        ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+                        : 'Nom non renseigné'
+                      }
+                    </div>
+                    <div className="text-sm text-gray-600">{user.email}</div>
+                    <div className="text-xs text-gray-400 mt-1">ID: {user.id.substring(0, 8)}...</div>
                   </div>
-                  <div className="text-sm text-gray-600">{user.email}</div>
-                  <div className="text-xs text-gray-400 mt-1">ID: {user.id.substring(0, 8)}...</div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <Badge variant={
-                    user.role === 'admin' ? 'destructive' : 
-                    user.role === 'juriste' ? 'default' : 
-                    'secondary'
-                  }>
-                    {user.role}
-                  </Badge>
                   
-                  <Select 
-                    value={user.role} 
-                    onValueChange={(newRole) => updateUserRole(user.id, newRole)}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="citoyen">Citoyen</SelectItem>
-                      <SelectItem value="juriste">Juriste</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={
+                      user.role === 'admin' ? 'destructive' : 
+                      user.role === 'juriste' ? 'default' : 
+                      'secondary'
+                    }>
+                      {user.role}
+                    </Badge>
+                    
+                    <Select 
+                      value={user.role} 
+                      onValueChange={(newRole) => updateUserRole(user.id, newRole)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="citoyen">Citoyen</SelectItem>
+                        <SelectItem value="juriste">Juriste</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
+              </Card>
             ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
         )}
 
