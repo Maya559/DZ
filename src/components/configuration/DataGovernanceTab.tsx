@@ -7,6 +7,8 @@ import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Database, 
   GitBranch, 
@@ -191,6 +193,48 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
     }
   };
 
+  // Pagination pour les politiques de rétention
+  const {
+    currentData: paginatedRetentionPolicies,
+    currentPage: retentionCurrentPage,
+    totalPages: retentionTotalPages,
+    itemsPerPage: retentionItemsPerPage,
+    totalItems: retentionTotalItems,
+    setCurrentPage: setRetentionCurrentPage,
+    setItemsPerPage: setRetentionItemsPerPage
+  } = usePagination({
+    data: retentionPolicies,
+    itemsPerPage: 4
+  });
+
+  // Pagination pour les protections de la vie privée
+  const {
+    currentData: paginatedPrivacyProtections,
+    currentPage: privacyCurrentPage,
+    totalPages: privacyTotalPages,
+    itemsPerPage: privacyItemsPerPage,
+    totalItems: privacyTotalItems,
+    setCurrentPage: setPrivacyCurrentPage,
+    setItemsPerPage: setPrivacyItemsPerPage
+  } = usePagination({
+    data: privacyProtections,
+    itemsPerPage: 4
+  });
+
+  // Pagination pour les métriques de conformité
+  const {
+    currentData: paginatedComplianceMetrics,
+    currentPage: complianceCurrentPage,
+    totalPages: complianceTotalPages,
+    itemsPerPage: complianceItemsPerPage,
+    totalItems: complianceTotalItems,
+    setCurrentPage: setComplianceCurrentPage,
+    setItemsPerPage: setComplianceItemsPerPage
+  } = usePagination({
+    data: complianceMetrics,
+    itemsPerPage: 4
+  });
+
   return (
     <div className="space-y-6">
       {/* Data Lineage */}
@@ -267,7 +311,7 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {retentionPolicies.map((policy, index) => (
+            {paginatedRetentionPolicies.map((policy, index) => (
               <Card key={index} className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -310,6 +354,16 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
               </Card>
             ))}
           </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={retentionCurrentPage}
+              totalPages={retentionTotalPages}
+              totalItems={retentionTotalItems}
+              itemsPerPage={retentionItemsPerPage}
+              onPageChange={setRetentionCurrentPage}
+              onItemsPerPageChange={setRetentionItemsPerPage}
+            />
+          </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" size="sm">Nouvelle politique</Button>
             <Button variant="outline" size="sm">Rapport rétention</Button>
@@ -336,7 +390,7 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {privacyProtections.map((protection, index) => (
+            {paginatedPrivacyProtections.map((protection, index) => (
               <div key={index} className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -361,6 +415,16 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={privacyCurrentPage}
+              totalPages={privacyTotalPages}
+              totalItems={privacyTotalItems}
+              itemsPerPage={privacyItemsPerPage}
+              onPageChange={setPrivacyCurrentPage}
+              onItemsPerPageChange={setPrivacyItemsPerPage}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" size="sm">Évaluation impact</Button>
@@ -399,7 +463,7 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
             </div>
           </div>
           <div className="space-y-4">
-            {complianceMetrics.map((compliance, index) => (
+            {paginatedComplianceMetrics.map((compliance, index) => (
               <Card key={index} className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -456,6 +520,16 @@ export function DataGovernanceTab({ language = "fr" }: DataGovernanceTabProps) {
                 </div>
               </Card>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={complianceCurrentPage}
+              totalPages={complianceTotalPages}
+              totalItems={complianceTotalItems}
+              itemsPerPage={complianceItemsPerPage}
+              onPageChange={setComplianceCurrentPage}
+              onItemsPerPageChange={setComplianceItemsPerPage}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" size="sm">Évaluation globale</Button>
