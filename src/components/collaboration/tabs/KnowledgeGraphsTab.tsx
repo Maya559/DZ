@@ -13,6 +13,8 @@ import {
   Zap
 } from 'lucide-react';
 import { buttonHandlers } from '@/utils/buttonUtils';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function KnowledgeGraphsTab() {
   const [contributeOpen, setContributeOpen] = useState(false);
@@ -38,6 +40,20 @@ export function KnowledgeGraphsTab() {
     }
   ];
 
+  // Pagination pour les graphes de connaissances
+  const {
+    currentData: paginatedGraphs,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: knowledgeGraphs,
+    itemsPerPage: 4
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -52,7 +68,7 @@ export function KnowledgeGraphsTab() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {knowledgeGraphs.map((graph) => (
+        {paginatedGraphs.map((graph) => (
           <Card key={graph.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -98,6 +114,18 @@ export function KnowledgeGraphsTab() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Quick Actions */}

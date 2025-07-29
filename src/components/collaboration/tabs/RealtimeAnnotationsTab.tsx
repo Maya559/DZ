@@ -10,6 +10,8 @@ import {
   Clock,
   Users
 } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function RealtimeAnnotationsTab() {
   const [createAnnotationOpen, setCreateAnnotationOpen] = useState(false);
@@ -37,6 +39,20 @@ export function RealtimeAnnotationsTab() {
     }
   ];
 
+  // Pagination pour les annotations en temps réel
+  const {
+    currentData: paginatedAnnotations,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: realtimeAnnotations,
+    itemsPerPage: 6
+  });
+
   const handleSaveAnnotation = (annotationData: Record<string, unknown>) => {
     console.log('Nouvelle annotation créée:', annotationData);
     // Ici on ajouterait la logique pour sauvegarder l'annotation
@@ -53,7 +69,7 @@ export function RealtimeAnnotationsTab() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {realtimeAnnotations.map((annotation) => (
+            {paginatedAnnotations.map((annotation) => (
               <div key={annotation.id} className="border rounded-lg p-4 hover:bg-gray-50">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
@@ -94,6 +110,18 @@ export function RealtimeAnnotationsTab() {
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Pagination */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
           
           <Button 
