@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Filter, 
   Search, 
@@ -63,6 +65,72 @@ export function FavoritesSection() {
     }
   ];
 
+  // Filtrage des favoris
+  const filteredFavorites = favorites.filter(item => 
+    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  // Séparation par type
+  const allFavorites = filteredFavorites;
+  const codes = filteredFavorites.filter(item => item.type === 'code');
+  const lois = filteredFavorites.filter(item => item.type === 'loi');
+  const procedures = filteredFavorites.filter(item => item.type === 'procedure');
+
+  // Pagination pour chaque onglet
+  const {
+    currentData: paginatedAll,
+    currentPage: allCurrentPage,
+    totalPages: allTotalPages,
+    itemsPerPage: allItemsPerPage,
+    totalItems: allTotalItems,
+    setCurrentPage: setAllCurrentPage,
+    setItemsPerPage: setAllItemsPerPage
+  } = usePagination({
+    data: allFavorites,
+    itemsPerPage: 6
+  });
+
+  const {
+    currentData: paginatedCodes,
+    currentPage: codesCurrentPage,
+    totalPages: codesTotalPages,
+    itemsPerPage: codesItemsPerPage,
+    totalItems: codesTotalItems,
+    setCurrentPage: setCodesCurrentPage,
+    setItemsPerPage: setCodesItemsPerPage
+  } = usePagination({
+    data: codes,
+    itemsPerPage: 6
+  });
+
+  const {
+    currentData: paginatedLois,
+    currentPage: loisCurrentPage,
+    totalPages: loisTotalPages,
+    itemsPerPage: loisItemsPerPage,
+    totalItems: loisTotalItems,
+    setCurrentPage: setLoisCurrentPage,
+    setItemsPerPage: setLoisItemsPerPage
+  } = usePagination({
+    data: lois,
+    itemsPerPage: 6
+  });
+
+  const {
+    currentData: paginatedProcedures,
+    currentPage: proceduresCurrentPage,
+    totalPages: proceduresTotalPages,
+    itemsPerPage: proceduresItemsPerPage,
+    totalItems: proceduresTotalItems,
+    setCurrentPage: setProceduresCurrentPage,
+    setItemsPerPage: setProceduresItemsPerPage
+  } = usePagination({
+    data: procedures,
+    itemsPerPage: 6
+  });
+
   const handleFilterClick = () => {
     setShowFilters(!showFilters);
     // Ouvrir la modale de filtres avancés
@@ -104,14 +172,15 @@ export function FavoritesSection() {
 
       <Tabs defaultValue="tous" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="tous">Tous (3)</TabsTrigger>
-          <TabsTrigger value="codes">Codes</TabsTrigger>
-          <TabsTrigger value="lois">Lois</TabsTrigger>
-          <TabsTrigger value="procedures">Procédures</TabsTrigger>
+          <TabsTrigger value="tous">Tous ({allFavorites.length})</TabsTrigger>
+          <TabsTrigger value="codes">Codes ({codes.length})</TabsTrigger>
+          <TabsTrigger value="lois">Lois ({lois.length})</TabsTrigger>
+          <TabsTrigger value="procedures">Procédures ({procedures.length})</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tous" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-          {favorites.map((item) => (
+        <TabsContent value="tous" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {paginatedAll.map((item) => (
             <Card key={item.id} className="border-l-4 border-l-emerald-500">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -187,81 +256,234 @@ export function FavoritesSection() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            ))}
 
-          {/* Quick Actions */}
-          <Card className="border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors">
-            <CardContent className="p-6 text-center">
-              <Star className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold mb-2">Ajouter aux favoris</h3>
-              <p className="text-gray-600 mb-4">
-                Parcourez les textes juridiques et procédures pour les ajouter à vos favoris
-              </p>
-              <div className="flex gap-2 justify-center">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2"
-                  onClick={buttonHandlers.browseType('legal', 'Textes juridiques')}
-                >
-                  <Scale className="w-4 h-4" />
-                  Textes juridiques
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={buttonHandlers.browseType('procedure', 'Procédures')}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Procédures
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-red-600 hover:text-red-700"
-                  onClick={() => {
-                    import('@/utils/modalManager').then(({ openClearFavoritesModal }) => {
-                      openClearFavoritesModal();
-                    });
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Vider
-                </Button>
+            {/* Quick Actions */}
+            <Card className="border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors">
+              <CardContent className="p-6 text-center">
+                <Star className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-semibold mb-2">Ajouter aux favoris</h3>
+                <p className="text-gray-600 mb-4">
+                  Parcourez les textes juridiques et procédures pour les ajouter à vos favoris
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={buttonHandlers.browseType('legal', 'Textes juridiques')}
+                  >
+                    <Scale className="w-4 h-4" />
+                    Textes juridiques
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={buttonHandlers.browseType('procedure', 'Procédures')}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Procédures
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700"
+                    onClick={() => {
+                      import('@/utils/modalManager').then(({ openClearFavoritesModal }) => {
+                        openClearFavoritesModal();
+                      });
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Vider
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Pagination pour l'onglet Tous */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={allCurrentPage}
+              totalPages={allTotalPages}
+              totalItems={allTotalItems}
+              itemsPerPage={allItemsPerPage}
+              onPageChange={setAllCurrentPage}
+              onItemsPerPageChange={setAllItemsPerPage}
+            />
+          </div>
+        </TabsContent>
+
+        {/* Onglet Codes */}
+        <TabsContent value="codes" className="space-y-6">
+          {codes.length > 0 ? (
+            <div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {paginatedCodes.map((item) => (
+                  <Card key={item.id} className="border-l-4 border-l-blue-500">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen className="w-5 h-5 text-blue-600" />
+                            <h3 className="text-lg font-semibold">{item.title}</h3>
+                          </div>
+                          <p className="text-gray-600 mb-3">{item.subtitle}</p>
+                          
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {item.tags.map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <div>Ajouté le {item.addedDate}</div>
+                            <div>Consulté le {item.viewedDate}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </CardContent>
-          </Card>
+              
+              <div className="mt-6">
+                <Pagination
+                  currentPage={codesCurrentPage}
+                  totalPages={codesTotalPages}
+                  totalItems={codesTotalItems}
+                  itemsPerPage={codesItemsPerPage}
+                  onPageChange={setCodesCurrentPage}
+                  onItemsPerPageChange={setCodesItemsPerPage}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold mb-2">Aucun code en favoris</h3>
+              <p className="text-gray-600">
+                Ajoutez des codes juridiques à vos favoris pour les retrouver facilement
+              </p>
+            </div>
+          )}
         </TabsContent>
 
-        {/* Other tabs content */}
-        <TabsContent value="codes" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-          <div className="col-span-full text-center py-8">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Aucun code en favoris</h3>
-            <p className="text-gray-600">
-              Ajoutez des codes juridiques à vos favoris pour les retrouver facilement
-            </p>
-          </div>
+        {/* Onglet Lois */}
+        <TabsContent value="lois" className="space-y-6">
+          {lois.length > 0 ? (
+            <div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {paginatedLois.map((item) => (
+                  <Card key={item.id} className="border-l-4 border-l-purple-500">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Scale className="w-5 h-5 text-purple-600" />
+                            <h3 className="text-lg font-semibold">{item.title}</h3>
+                          </div>
+                          <p className="text-gray-600 mb-3">{item.subtitle}</p>
+                          
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {item.tags.map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <div>Ajouté le {item.addedDate}</div>
+                            <div>Consulté le {item.viewedDate}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              <div className="mt-6">
+                <Pagination
+                  currentPage={loisCurrentPage}
+                  totalPages={loisTotalPages}
+                  totalItems={loisTotalItems}
+                  itemsPerPage={loisItemsPerPage}
+                  onPageChange={setLoisCurrentPage}
+                  onItemsPerPageChange={setLoisItemsPerPage}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Scale className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold mb-2">Aucune loi en favoris</h3>
+              <p className="text-gray-600">
+                Ajoutez des lois à vos favoris pour les retrouver facilement
+              </p>
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="lois" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-          <div className="col-span-full text-center py-8">
-            <Scale className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Aucune loi en favoris</h3>
-            <p className="text-gray-600">
-              Ajoutez des lois à vos favoris pour les retrouver facilement
-            </p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="procedures" className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-          <div className="col-span-full text-center py-8">
-            <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Aucune procédure en favoris</h3>
-            <p className="text-gray-600">
-              Ajoutez des procédures à vos favoris pour les retrouver facilement
-            </p>
-          </div>
+        {/* Onglet Procédures */}
+        <TabsContent value="procedures" className="space-y-6">
+          {procedures.length > 0 ? (
+            <div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {paginatedProcedures.map((item) => (
+                  <Card key={item.id} className="border-l-4 border-l-green-500">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FileText className="w-5 h-5 text-green-600" />
+                            <h3 className="text-lg font-semibold">{item.title}</h3>
+                          </div>
+                          <p className="text-gray-600 mb-3">{item.subtitle}</p>
+                          
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {item.tags.map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          
+                          <div className="text-xs text-gray-500 space-y-1">
+                            <div>Ajouté le {item.addedDate}</div>
+                            <div>Consulté le {item.viewedDate}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              <div className="mt-6">
+                <Pagination
+                  currentPage={proceduresCurrentPage}
+                  totalPages={proceduresTotalPages}
+                  totalItems={proceduresTotalItems}
+                  itemsPerPage={proceduresItemsPerPage}
+                  onPageChange={setProceduresCurrentPage}
+                  onItemsPerPageChange={setProceduresItemsPerPage}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold mb-2">Aucune procédure en favoris</h3>
+              <p className="text-gray-600">
+                Ajoutez des procédures à vos favoris pour les retrouver facilement
+              </p>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

@@ -10,6 +10,7 @@ import { NewsReferencesSections } from "@/components/NewsReferencesSections";
 import { ConfigurationSections } from "@/components/ConfigurationSections";
 import { HelpSections } from "@/components/HelpSections";
 import { AISearchSection } from "@/components/AISearchSection";
+import { MessagesNotificationsSection } from "@/components/messages/MessagesNotificationsSection";
 import { FavoritesSection } from "@/components/FavoritesSection";
 import { DataExtractionSection } from "@/components/DataExtractionSection";
 import { DocumentTemplatesSection } from "@/components/DocumentTemplatesSection";
@@ -861,60 +862,7 @@ export function ContentRenderer({ activeSection, language, refreshTrigger }: Con
       );
 
     case "messages":
-      return (
-        <div className="max-w-6xl mx-auto p-6">
-          <h1 className="text-3xl font-bold mb-6">Messages et Notifications</h1>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-xl font-semibold mb-4">Messages récents</h2>
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                    <h3 className="font-medium text-blue-900">Nouvelle mise à jour juridique</h3>
-                    <p className="text-blue-700 text-sm mt-1">
-                      Une nouvelle loi sur le commerce électronique a été publiée au Journal Officiel.
-                    </p>
-                    <p className="text-blue-600 text-xs mt-2">Il y a 2 heures</p>
-                  </div>
-                  <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded">
-                    <h3 className="font-medium text-green-900">Validation de document</h3>
-                    <p className="text-green-700 text-sm mt-1">
-                      Votre document "Procédure d'immatriculation" a été validé et publié.
-                    </p>
-                    <p className="text-green-600 text-xs mt-2">Il y a 1 jour</p>
-                  </div>
-                  <div className="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-                    <h3 className="font-medium text-yellow-900">Rappel de deadline</h3>
-                    <p className="text-yellow-700 text-sm mt-1">
-                      N'oubliez pas de soumettre votre rapport mensuel avant le 30 du mois.
-                    </p>
-                    <p className="text-yellow-600 text-xs mt-2">Il y a 3 jours</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-xl font-semibold mb-4">Paramètres</h2>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Notifications email</span>
-                    <input type="checkbox" className="rounded" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Alertes juridiques</span>
-                    <input type="checkbox" className="rounded" defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Messages système</span>
-                    <input type="checkbox" className="rounded" defaultChecked />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+      return <MessagesNotificationsSection />;
 
     // AI sections
     case "ai-assistant":
