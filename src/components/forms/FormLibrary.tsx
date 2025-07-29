@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Search, Eye, Download, Edit, FileText, Copy, ExternalLink } from 'lucide-react';
 import { ALL_FORM_TEMPLATES } from '@/data/formTemplatesFinal';
 import { FormTemplate } from '@/data/formTemplates';
@@ -20,10 +22,8 @@ interface FormLibraryProps {
 export function FormLibrary({ onSelectTemplate, onAddToLegalTexts, onAddToProcedures }: FormLibraryProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [previewTemplate, setPreviewTemplate] = useState<FormTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const itemsPerPage = 10;
   const { toast } = useToast();
 
   // Catégories prédéfinies avec filtres spéciaux
@@ -59,9 +59,19 @@ export function FormLibrary({ onSelectTemplate, onAddToLegalTexts, onAddToProced
     return matchesSearch && matchesCategory;
   });
 
-  const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTemplates = filteredTemplates.slice(startIndex, startIndex + itemsPerPage);
+  // Pagination pour les templates de formulaires
+  const {
+    currentData: paginatedTemplates,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredTemplates,
+    itemsPerPage: 10
+  });
 
   const handlePreview = (template: FormTemplate) => {
     setPreviewTemplate(template);
@@ -230,29 +240,16 @@ export function FormLibrary({ onSelectTemplate, onAddToLegalTexts, onAddToProced
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            Précédent
-          </Button>
-          <span className="text-sm text-gray-600">
-            Page {currentPage} sur {totalPages} ({filteredTemplates.length} formulaires)
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-          >
-            Suivant
-          </Button>
-        </div>
-      )}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      </div>
 
       {/* Modal d'aperçu */}
       <FormPreviewModal
