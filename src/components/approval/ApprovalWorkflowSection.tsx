@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   CheckCircle, 
   XCircle, 
@@ -78,6 +80,20 @@ export function ApprovalWorkflowSection() {
       comments: 2
     }
   ];
+
+  // Pagination pour les éléments d'approbation
+  const {
+    currentData: paginatedItems,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: approvalItems,
+    itemsPerPage: 5
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -156,77 +172,92 @@ export function ApprovalWorkflowSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Demandes en attente</h2>
-          {approvalItems.map((item) => (
-            <Card 
-              key={item.id} 
-              className={`hover:shadow-lg transition-shadow cursor-pointer ${
-                selectedItem?.id === item.id ? 'ring-2 ring-blue-500' : ''
-              }`}
-              onClick={() => setSelectedItem(item)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getStatusIcon(item.status)}
-                      <Badge className={getStatusColor(item.status)}>
-                        {item.status.replace('_', ' ')}
-                      </Badge>
-                      <Badge className={getPriorityColor(item.priority)}>
-                        {item.priority}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg">{item.title}</CardTitle>
-                    <p className="text-sm text-gray-600 mt-2">{item.description}</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      <span>{item.submittedBy}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>Échéance: {new Date(item.deadline).toLocaleDateString('fr-FR')}</span>
+          {/* Liste des éléments d'approbation avec pagination */}
+          <div className="space-y-4">
+            {paginatedItems.map((item) => (
+              <Card 
+                key={item.id} 
+                className={`hover:shadow-md transition-shadow cursor-pointer ${
+                  selectedItem?.id === item.id ? 'ring-2 ring-blue-500' : ''
+                }`}
+                onClick={() => setSelectedItem(item)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {getStatusIcon(item.status)}
+                        <Badge className={getStatusColor(item.status)}>
+                          {item.status.replace('_', ' ')}
+                        </Badge>
+                        <Badge className={getPriorityColor(item.priority)}>
+                          {item.priority}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-lg">{item.title}</CardTitle>
+                      <p className="text-sm text-gray-600 mt-2">{item.description}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <MessageSquare className="w-4 h-4" />
-                      <span>{item.comments} commentaires</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        <span>{item.submittedBy}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>Échéance: {new Date(item.deadline).toLocaleDateString('fr-FR')}</span>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          buttonHandlers.viewDocument(item.id.toString(), item.title, item.type)();
-                        }}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Voir
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          buttonHandlers.generic(`Commenter: ${item.title}`, 'Ajout de commentaire', 'Approbation')();
-                        }}
-                      >
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
                         <MessageSquare className="w-4 h-4" />
-                      </Button>
+                        <span>{item.comments} commentaires</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            buttonHandlers.viewDocument(item.id.toString(), item.title, item.type)();
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Voir
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            buttonHandlers.generic(`Commenter: ${item.title}`, 'Ajout de commentaire', 'Approbation')();
+                          }}
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
+          </div>
         </div>
 
         {/* Approval panel */}

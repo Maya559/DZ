@@ -7,6 +7,8 @@ import { buttonHandlers } from '@/utils/buttonUtils';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { VideoPlayerModal } from '@/components/modals/VideoPlayerModal';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Play, 
   Search, 
@@ -162,6 +164,20 @@ export function VideoTutorialsSection() {
     return matchesSearch && matchesCategory;
   });
 
+  // Pagination pour les tutoriels vidéo
+  const {
+    currentData: paginatedTutorials,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredVideos,
+    itemsPerPage: 6
+  });
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -270,9 +286,9 @@ export function VideoTutorialsSection() {
         </CardContent>
       </Card>
 
-      {/* Liste des vidéos */}
+      {/* Liste des tutoriels avec pagination */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredVideos.map((video) => (
+        {paginatedTutorials.map((video) => (
           <Card key={video.id} className="hover:shadow-lg transition-shadow cursor-pointer">
             <div className="relative">
               <div className="aspect-video bg-gray-200 rounded-t-lg flex items-center justify-center">
@@ -336,6 +352,18 @@ export function VideoTutorialsSection() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Actions rapides */}

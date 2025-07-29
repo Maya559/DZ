@@ -2,6 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Eye, 
   Share2,
@@ -30,10 +32,24 @@ export function CollaborativeSurveillanceTab() {
     }
   ];
 
+  // Pagination pour les éléments de surveillance
+  const {
+    currentData: paginatedItems,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: surveillanceItems,
+    itemsPerPage: 4
+  });
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {surveillanceItems.map((item) => (
+        {paginatedItems.map((item) => (
           <Card key={item.id}>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -88,6 +104,18 @@ export function CollaborativeSurveillanceTab() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
     </div>
   );
