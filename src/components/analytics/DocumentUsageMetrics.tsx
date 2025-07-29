@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   FileText, 
   Eye, 
@@ -113,6 +115,20 @@ export function DocumentUsageMetrics() {
     }
   ];
 
+  // Pagination pour l'activité récente (topDocuments)
+  const {
+    currentData: paginatedRecentActivity,
+    currentPage: recentActivityCurrentPage,
+    totalPages: recentActivityTotalPages,
+    itemsPerPage: recentActivityItemsPerPage,
+    totalItems: recentActivityTotalItems,
+    setCurrentPage: setRecentActivityCurrentPage,
+    setItemsPerPage: setRecentActivityItemsPerPage
+  } = usePagination({
+    data: topDocuments,
+    itemsPerPage: 5
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -168,7 +184,7 @@ export function DocumentUsageMetrics() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {topDocuments.slice(0, 3).map((doc) => (
+                  {paginatedRecentActivity.map((doc) => (
                     <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center gap-3">
                         <FileText className="w-5 h-5 text-emerald-600" />
@@ -183,6 +199,18 @@ export function DocumentUsageMetrics() {
                       </div>
                     </div>
                   ))}
+                </div>
+                
+                {/* Pagination pour l'activité récente */}
+                <div className="mt-4">
+                  <Pagination
+                    currentPage={recentActivityCurrentPage}
+                    totalPages={recentActivityTotalPages}
+                    totalItems={recentActivityTotalItems}
+                    itemsPerPage={recentActivityItemsPerPage}
+                    onPageChange={setRecentActivityCurrentPage}
+                    onItemsPerPageChange={setRecentActivityItemsPerPage}
+                  />
                 </div>
               </CardContent>
             </Card>

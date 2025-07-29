@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SectionHeader } from "@/components/common/SectionHeader";
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import DocumentDetailModal from "../modals/DocumentDetailModal";
 import { DocumentViewerModal } from "../modals/DocumentViewerModal";
 import { 
@@ -214,6 +216,20 @@ const ProceduresApprovalQueue: React.FC = () => {
     const matchesType = typeFilter === 'all' || doc.procedureCategory === typeFilter;
     const matchesInsertion = insertionFilter === 'all' || doc.insertionType === insertionFilter;
     return matchesSearch && matchesStatus && matchesType && matchesInsertion;
+  });
+
+  // Pagination pour les documents filtrés
+  const {
+    currentData: paginatedDocuments,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredDocuments,
+    itemsPerPage: 10
   });
 
   const getStatusBadge = (status: string) => {
@@ -471,7 +487,7 @@ const ProceduresApprovalQueue: React.FC = () => {
 
           {/* Documents */}
           <div className="space-y-3">
-            {filteredDocuments.map((doc) => (
+            {paginatedDocuments.map((doc) => (
               <Card 
                 key={doc.id} 
                 className={`p-4 cursor-pointer transition-all ${
@@ -521,6 +537,18 @@ const ProceduresApprovalQueue: React.FC = () => {
                 </div>
               </Card>
             ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
 
           {filteredDocuments.length === 0 && (

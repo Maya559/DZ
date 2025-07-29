@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Clock, 
   Calendar, 
@@ -102,6 +104,20 @@ export function LegalTextsTimelineTab() {
   const filteredTimelineData = selectedText === 'all' 
     ? timelineData 
     : timelineData.filter(item => item.textId === selectedText);
+
+  // Pagination pour la timeline des textes juridiques
+  const {
+    currentData: paginatedTimelineData,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredTimelineData,
+    itemsPerPage: 5
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -240,7 +256,7 @@ export function LegalTextsTimelineTab() {
           {/* Ligne verticale de la timeline */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200"></div>
           
-          {filteredTimelineData.map((item, index) => {
+          {paginatedTimelineData.map((item, index) => {
             const TypeIcon = getTypeIcon(item.type);
             return (
               <div key={item.id} className="relative flex items-start space-x-6 pb-8">
@@ -291,6 +307,18 @@ export function LegalTextsTimelineTab() {
             );
           })}
         </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Actions rapides */}

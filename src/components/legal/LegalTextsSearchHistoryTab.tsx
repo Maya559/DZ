@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   History, 
   Search, 
@@ -175,6 +177,20 @@ export function LegalTextsSearchHistoryTab() {
     const matchesAuthority = !selectedAuthority || selectedAuthority === 'Tous' || version.authority === selectedAuthority;
     
     return matchesSearch && matchesCategory && matchesType && matchesStatus && matchesAuthority;
+  });
+
+  // Pagination pour l'historique des recherches
+  const {
+    currentData: paginatedVersions,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredVersions,
+    itemsPerPage: 10
   });
 
   const getTypeColor = (type: string) => {
@@ -403,7 +419,7 @@ export function LegalTextsSearchHistoryTab() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {filteredVersions.map((version) => (
+            {paginatedVersions.map((version) => (
               <Card key={version.id} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-emerald-500">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
@@ -527,6 +543,18 @@ export function LegalTextsSearchHistoryTab() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
 
           {filteredVersions.length === 0 && (
