@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Calendar, 
   Clock, 
@@ -67,6 +69,20 @@ export function TimelineSection() {
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesYear = event.date.startsWith(selectedYear);
     return matchesSearch && matchesYear;
+  });
+
+  // Pagination pour les événements de timeline
+  const {
+    currentData: paginatedEvents,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredEvents,
+    itemsPerPage: 8
   });
 
   const getImpactColor = (impact: string) => {
@@ -144,79 +160,70 @@ export function TimelineSection() {
         </Button>
       </div>
 
-      {/* Timeline */}
-      <div className="space-y-6">
-        {filteredEvents.map((event, index) => (
-          <div key={event.id} className="flex gap-6">
-            {/* Timeline line */}
-            <div className="flex flex-col items-center">
-              <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>
-              {index < filteredEvents.length - 1 && (
-                <div className="w-0.5 h-20 bg-gray-200 mt-2"></div>
-              )}
-            </div>
-
-            {/* Event content */}
-            <Card className="flex-1 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getTypeIcon(event.type)}
-                      <Badge variant="outline" className="capitalize">
-                        {event.type}
-                      </Badge>
-                      <Badge className={getImpactColor(event.impact)}>
-                        Impact {event.impact}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg">{event.title}</CardTitle>
-                    <p className="text-gray-600 mt-2">{event.description}</p>
+      {/* Timeline des événements avec pagination */}
+      <div className="space-y-4">
+        {paginatedEvents.map((event) => (
+          <Card key={event.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    {getTypeIcon(event.type)}
+                    <Badge variant="outline" className="capitalize">
+                      {event.type}
+                    </Badge>
+                    <Badge className={getImpactColor(event.impact)}>
+                      Impact {event.impact}
+                    </Badge>
                   </div>
+                  <CardTitle className="text-lg">{event.title}</CardTitle>
+                  <p className="text-gray-600 mt-2">{event.description}</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(event.date).toLocaleDateString('fr-FR')}
-                    </span>
-                    <Badge variant="secondary">{event.category}</Badge>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={buttonHandlers.viewTimelineItem(event.id.toString(), event.title)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Consulter
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={buttonHandlers.downloadDocument(event.id.toString(), event.title)}
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(event.date).toLocaleDateString('fr-FR')}
+                  </span>
+                  <Badge variant="secondary">{event.category}</Badge>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={buttonHandlers.viewTimelineItem(event.id.toString(), event.title)}
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Consulter
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={buttonHandlers.downloadDocument(event.id.toString(), event.title)}
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
+      </div>
 
-        {filteredEvents.length === 0 && (
-          <div className="text-center py-8">
-            <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Aucun événement trouvé</h3>
-            <p className="text-gray-600">
-              Essayez de modifier vos critères de recherche ou votre année
-            </p>
-          </div>
-        )}
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Quick actions */}

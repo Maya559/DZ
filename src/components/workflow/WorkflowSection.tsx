@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Play, 
   Pause, 
@@ -72,6 +74,20 @@ export function WorkflowSection() {
                          workflow.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === 'tous' || workflow.status === selectedStatus;
     return matchesSearch && matchesStatus;
+  });
+
+  // Pagination pour les workflows
+  const {
+    currentData: paginatedWorkflows,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredWorkflows,
+    itemsPerPage: 5
   });
 
   const getStatusColor = (status: string) => {
@@ -144,9 +160,9 @@ export function WorkflowSection() {
         </select>
       </div>
 
-      {/* Workflows grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredWorkflows.map((workflow) => (
+      {/* Liste des workflows avec pagination */}
+      <div className="space-y-4">
+        {paginatedWorkflows.map((workflow) => (
           <Card key={workflow.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -221,6 +237,18 @@ export function WorkflowSection() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {filteredWorkflows.length === 0 && (
