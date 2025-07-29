@@ -16,6 +16,8 @@ import {
   User
 } from 'lucide-react';
 import { buttonHandlers } from '@/utils/buttonUtils';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface ForumTopic {
   id: number;
@@ -72,6 +74,27 @@ export function ForumSection() {
     }
   ];
 
+  // Filtrage des sujets
+  const filteredTopics = forumTopics.filter(topic =>
+    topic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    topic.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    topic.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination pour les sujets du forum
+  const {
+    currentData: paginatedTopics,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredTopics,
+    itemsPerPage: 10
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -116,10 +139,10 @@ export function ForumSection() {
         ))}
       </div>
 
-      {/* Topics */}
+      {/* Liste des sujets */}
       <div className="space-y-4">
-        {forumTopics.map((topic) => (
-          <Card key={topic.id} className="hover:shadow-lg transition-shadow">
+        {paginatedTopics.map((topic) => (
+          <Card key={topic.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -186,6 +209,18 @@ export function ForumSection() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Quick actions */}

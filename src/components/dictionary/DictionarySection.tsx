@@ -18,6 +18,8 @@ import {
 import { buttonHandlers } from '@/utils/buttonUtils';
 import { AddDictionaryTermForm } from '@/components/forms/AddDictionaryTermForm';
 import { EnrichDictionaryForm } from '@/components/forms/EnrichDictionaryForm';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface DictionaryEntry {
   id: number;
@@ -89,6 +91,20 @@ export function DictionarySection() {
                          entry.definition.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'tous' || entry.category === selectedCategory;
     return matchesSearch && matchesCategory;
+  });
+
+  // Pagination pour les entrées du dictionnaire
+  const {
+    currentData: paginatedEntries,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredEntries,
+    itemsPerPage: 8
   });
 
   const handleToggleFavorite = (termId: number, termName: string, isFavorite: boolean) => {
@@ -165,9 +181,9 @@ export function DictionarySection() {
         </Button>
       </div>
 
-      {/* Dictionary entries */}
-      <div className="space-y-4">
-        {filteredEntries.map((entry) => (
+      {/* Liste des entrées */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {paginatedEntries.map((entry) => (
           <Card key={entry.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -277,26 +293,18 @@ export function DictionarySection() {
             </CardContent>
           </Card>
         ))}
+      </div>
 
-        {filteredEntries.length === 0 && (
-          <div className="text-center py-8">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Aucun terme trouvé</h3>
-            <p className="text-gray-600">
-              Essayez de modifier votre recherche ou suggérez un nouveau terme
-            </p>
-            <Button 
-              className="mt-4"
-              onClick={() => {
-              import('@/utils/modalManager').then(({ openTermSuggestionModal }) => {
-                openTermSuggestionModal();
-              });
-            }}
-            >
-              Suggérer ce terme
-            </Button>
-          </div>
-        )}
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Quick actions */}

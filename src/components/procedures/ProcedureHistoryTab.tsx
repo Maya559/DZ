@@ -30,6 +30,8 @@ import {
   Users,
   Star
 } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface ProcedureVersion {
   id: string;
@@ -165,24 +167,38 @@ export function ProcedureHistoryTab() {
   const { modals, openDocumentView, openDownload, openComparison, closeModal } = useFunctionalModals();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedModificationType, setSelectedModificationType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedInstitution, setSelectedInstitution] = useState('');
   const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
 
-  const categories = ['Tous', 'Commercial', 'Civil', 'Fiscal', 'Urbanisme', 'Santé', 'Social'];
-  const types = ['Tous', 'Création', 'Mise à jour majeure', 'Mise à jour mineure', 'Correction', 'Révision', 'Archivage'];
+  const categories = ['Tous', 'Commercial', 'Civil', 'Fiscal', 'Administratif', 'Social', 'Environnemental'];
+  const modificationTypes = ['Tous', 'Création', 'Mise à jour majeure', 'Mise à jour mineure', 'Correction', 'Révision', 'Archivage'];
   const statuses = ['Tous', 'Actif', 'Archivé', 'Brouillon', 'En révision'];
+  const institutions = ['Tous', 'CNRC', 'Ministère de l\'Intérieur', 'DGI', 'Ministère du Travail', 'Ministère de l\'Environnement'];
 
   const filteredVersions = mockProcedureVersions.filter(version => {
     const matchesSearch = version.procedureName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          version.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          version.changes.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || selectedCategory === 'Tous' || version.category === selectedCategory;
-    const matchesType = !selectedType || selectedType === 'Tous' || version.type === selectedType;
+    const matchesModificationType = !selectedModificationType || selectedModificationType === 'Tous' || version.type === selectedModificationType;
     const matchesStatus = !selectedStatus || selectedStatus === 'Tous' || version.status === selectedStatus;
+    const matchesInstitution = !selectedInstitution || selectedInstitution === 'Tous' || version.institution.includes(selectedInstitution);
     
-    return matchesSearch && matchesCategory && matchesType && matchesStatus;
+    return matchesSearch && matchesCategory && matchesModificationType && matchesStatus && matchesInstitution;
   });
+
+  // Pagination sur les versions filtrées
+  const {
+    currentData: paginatedVersions,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({ data: filteredVersions, itemsPerPage: 10 });
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -276,12 +292,12 @@ export function ProcedureHistoryTab() {
               </SelectContent>
             </Select>
 
-            <Select value={selectedType} onValueChange={setSelectedType}>
+            <Select value={selectedModificationType} onValueChange={setSelectedModificationType}>
               <SelectTrigger>
                 <SelectValue placeholder="Type de modification" />
               </SelectTrigger>
               <SelectContent>
-                {types.map((type) => (
+                {modificationTypes.map((type) => (
                   <SelectItem key={type} value={type}>{type}</SelectItem>
                 ))}
               </SelectContent>
@@ -298,13 +314,25 @@ export function ProcedureHistoryTab() {
               </SelectContent>
             </Select>
 
+            <Select value={selectedInstitution} onValueChange={setSelectedInstitution}>
+              <SelectTrigger>
+                <SelectValue placeholder="Institution" />
+              </SelectTrigger>
+              <SelectContent>
+                {institutions.map((institution) => (
+                  <SelectItem key={institution} value={institution}>{institution}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Button 
               variant="outline" 
               onClick={() => {
                 setSearchTerm('');
                 setSelectedCategory('');
-                setSelectedType('');
+                setSelectedModificationType('');
                 setSelectedStatus('');
+                setSelectedInstitution('');
               }}
             >
               Réinitialiser
@@ -376,7 +404,7 @@ export function ProcedureHistoryTab() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredVersions.map((version) => (
+            {paginatedVersions.map((version) => (
               <div key={version.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4 flex-1">
@@ -476,6 +504,16 @@ export function ProcedureHistoryTab() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
 
           {filteredVersions.length === 0 && (

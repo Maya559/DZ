@@ -17,6 +17,8 @@ import {
   Target,
   Zap
 } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface AnalyticsData {
   totalDocuments: number;
@@ -33,6 +35,34 @@ interface AnalyticsData {
 const OCRAnalyticsComponent: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+
+  // Pagination pour l'activité utilisateur
+  const {
+    currentData: paginatedUserActivity,
+    currentPage: userPage,
+    totalPages: userTotalPages,
+    itemsPerPage: userItemsPerPage,
+    totalItems: userTotalItems,
+    setCurrentPage: setUserPage,
+    setItemsPerPage: setUserItemsPerPage
+  } = usePagination({
+    data: analyticsData?.userActivity || [],
+    itemsPerPage: 5
+  });
+
+  // Pagination pour l'analyse d'erreurs
+  const {
+    currentData: paginatedErrorAnalysis,
+    currentPage: errorPage,
+    totalPages: errorTotalPages,
+    itemsPerPage: errorItemsPerPage,
+    totalItems: errorTotalItems,
+    setCurrentPage: setErrorPage,
+    setItemsPerPage: setErrorItemsPerPage
+  } = usePagination({
+    data: analyticsData?.errorAnalysis || [],
+    itemsPerPage: 5
+  });
 
   useEffect(() => {
     // Simulation de données analytics
@@ -313,76 +343,76 @@ const OCRAnalyticsComponent: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              Activité des Utilisateurs
-            </h3>
-            <div className="space-y-4">
-              {analyticsData.userActivity.map((user, index) => (
-                <div key={user.user} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold">
-                      {user.user.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div>
-                      <p className="font-medium">{user.user}</p>
-                      <p className="text-sm text-gray-600">
-                        {user.processed} traités • {user.approved} approuvés
-                      </p>
-                    </div>
+        {/* Activité utilisateur avec pagination */}
+        <TabsContent value="users" className="space-y-4">
+          <div className="space-y-4">
+            {paginatedUserActivity.map((user, index) => (
+              <Card key={index} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-semibold">
+                    {user.user.split(' ').map(n => n[0]).join('')}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      Taux: {((user.approved / user.processed) * 100).toFixed(1)}%
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      <Clock className="inline h-3 w-3 mr-1" />
-                      {user.avgTime}s moy.
+                  <div>
+                    <p className="font-medium">{user.user}</p>
+                    <p className="text-sm text-gray-600">
+                      {user.processed} traités • {user.approved} approuvés
                     </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
+                <div className="text-right">
+                  <p className="text-sm font-medium">
+                    Taux: {((user.approved / user.processed) * 100).toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    <Clock className="inline h-3 w-3 mr-1" />
+                    {user.avgTime}s moy.
+                  </p>
+                </div>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={userPage}
+              totalPages={userTotalPages}
+              totalItems={userTotalItems}
+              itemsPerPage={userItemsPerPage}
+              onPageChange={setUserPage}
+              onItemsPerPageChange={setUserItemsPerPage}
+            />
+          </div>
         </TabsContent>
 
-        <TabsContent value="errors" className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center">
-              <AlertTriangle className="mr-2 h-5 w-5 text-red-600" />
-              Analyse des Erreurs
-            </h3>
-            <div className="space-y-4">
-              {analyticsData.errorAnalysis.map((error) => (
-                <div key={error.error} className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">{error.error}</span>
-                    <span className="text-sm text-gray-600">
-                      {error.count} occurrences ({error.percentage}%)
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-red-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${error.percentage}%` }}
-                    ></div>
-                  </div>
+        {/* Analyse d'erreurs avec pagination */}
+        <TabsContent value="errors" className="space-y-4">
+          <div className="space-y-4">
+            {paginatedErrorAnalysis.map((error, index) => (
+              <Card key={index} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">{error.error}</span>
+                  <span className="text-sm text-gray-600">
+                    {error.count} occurrences ({error.percentage}%)
+                  </span>
                 </div>
-              ))}
-            </div>
-            
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Recommandations</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Améliorer la préparation des documents PDF avant upload</li>
-                <li>• Former les utilisateurs sur les formats supportés</li>
-                <li>• Implémenter une validation préalable des fichiers</li>
-                <li>• Ajouter des guides d'utilisation contextuels</li>
-              </ul>
-            </div>
-          </Card>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-red-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${error.percentage}%` }}
+                  ></div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={errorPage}
+              totalPages={errorTotalPages}
+              totalItems={errorTotalItems}
+              itemsPerPage={errorItemsPerPage}
+              onPageChange={setErrorPage}
+              onItemsPerPageChange={setErrorItemsPerPage}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { buttonHandlers } from '@/utils/buttonUtils';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Copy, 
   Trash2, 
@@ -136,6 +138,20 @@ export function DeduplicationEngine() {
       ]
     }
   ];
+
+  // Pagination pour les groupes de doublons
+  const {
+    currentData: paginatedGroups,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: duplicateGroups,
+    itemsPerPage: 5
+  });
 
   const handleStartScan = () => {
     setIsScanning(true);
@@ -291,7 +307,7 @@ export function DeduplicationEngine() {
 
       {/* Groupes de duplicatas */}
       <div className="space-y-4">
-        {duplicateGroups.map((group) => (
+        {paginatedGroups.map((group) => (
           <Card key={group.id} className="hover:shadow-md transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -378,6 +394,18 @@ export function DeduplicationEngine() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
 
       {/* Statistiques */}
