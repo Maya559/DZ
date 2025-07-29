@@ -14,6 +14,8 @@ import {
   Eye
 } from 'lucide-react';
 import { buttonHandlers } from '@/utils/buttonUtils';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface NewsItem {
   id: number;
@@ -70,6 +72,20 @@ export function NewsSection() {
     return matchesSearch && matchesCategory;
   });
 
+  // Pagination pour les actualités
+  const {
+    currentData: paginatedNews,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredNews,
+    itemsPerPage: 6
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -113,59 +129,74 @@ export function NewsSection() {
         </TabsList>
 
         <TabsContent value={selectedCategory} className="space-y-4 mt-6">
-          {filteredNews.map((news) => (
-            <Card key={news.id} className={`hover:shadow-lg transition-shadow ${news.isUrgent ? 'border-l-4 border-l-red-500' : ''}`}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {news.isUrgent && (
-                        <Badge variant="destructive" className="text-xs">
-                          URGENT
-                        </Badge>
-                      )}
-                      <Badge variant="outline">{news.category}</Badge>
+          {/* Liste des actualités avec pagination */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedNews.map((news) => (
+              <Card key={news.id} className={`hover:shadow-lg transition-shadow ${news.isUrgent ? 'border-l-4 border-l-red-500' : ''}`}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {news.isUrgent && (
+                          <Badge variant="destructive" className="text-xs">
+                            URGENT
+                          </Badge>
+                        )}
+                        <Badge variant="outline">{news.category}</Badge>
+                      </div>
+                      <CardTitle className="text-xl mb-2">{news.title}</CardTitle>
+                      <p className="text-gray-600">{news.summary}</p>
                     </div>
-                    <CardTitle className="text-xl mb-2">{news.title}</CardTitle>
-                    <p className="text-gray-600">{news.summary}</p>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(news.date).toLocaleDateString('fr-FR')}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {news.readTime}
-                    </span>
-                    <span>{news.source}</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(news.date).toLocaleDateString('fr-FR')}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {news.readTime}
+                      </span>
+                      <span>{news.source}</span>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={buttonHandlers.readNews(news.title)}
+                      >
+                        <BookOpen className="w-4 h-4 mr-2" />
+                        Lire
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={buttonHandlers.generic(`Voir source: ${news.source}`, 'Consultation de la source', 'News')}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={buttonHandlers.readNews(news.title)}
-                    >
-                      <BookOpen className="w-4 h-4 mr-2" />
-                      Lire
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={buttonHandlers.generic(`Voir source: ${news.source}`, 'Consultation de la source', 'News')}
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
+          </div>
 
           {filteredNews.length === 0 && (
             <div className="text-center py-8">
