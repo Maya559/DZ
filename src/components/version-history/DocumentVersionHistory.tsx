@@ -434,90 +434,99 @@ export function DocumentVersionHistory({ type = 'both' }: DocumentVersionHistory
       )}
 
       {/* Liste des versions avec pagination */}
-      <div className="space-y-4">
-        {paginatedVersions.map((version) => (
-          <Card key={version.id} className="hover:shadow-lg transition-shadow">
-                    {/* Indicateur de version */}
-                    <div className="flex-shrink-0">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        version.status === 'active' ? 'bg-green-100' : 
-                        version.status === 'archived' ? 'bg-gray-100' : 'bg-yellow-100'
-                      }`}>
-                        {getStatusIcon(version.status)}
-                      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <GitBranch className="w-5 h-5" />
+            Toutes les versions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {paginatedVersions.map((version) => (
+              <div key={version.id} className="relative">
+                <div className="flex gap-4">
+                  {/* Indicateur de version */}
+                  <div className="flex-shrink-0">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      version.status === 'active' ? 'bg-green-100' : 
+                      version.status === 'archived' ? 'bg-gray-100' : 'bg-yellow-100'
+                    }`}>
+                      {getStatusIcon(version.status)}
                     </div>
+                  </div>
 
-                    {/* Contenu de la version */}
-                    <Card className="flex-1">
-                      <CardContent className="p-4">
-                        <div className="space-y-3">
-                          {/* En-tête */}
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-semibold text-lg">{version.version}</span>
-                                <Badge className={getStatusColor(version.status)}>
-                                  {version.status === 'active' ? 'Version actuelle' : 
-                                   version.status === 'archived' ? 'Archivée' : 'Brouillon'}
-                                </Badge>
-                                <Badge className={getTypeColor(version.type)}>
-                                  {version.category}
-                                </Badge>
-                              </div>
-                              {version.description && (
-                                <p className="text-sm text-gray-600">{version.description}</p>
-                              )}
-                            </div>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4 mr-1" />
-                                Consulter
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Download className="w-4 h-4 mr-1" />
-                                Télécharger
-                              </Button>
-                            </div>
-                          </div>
-
-                          {/* Métadonnées */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              {version.publishDate}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <User className="w-4 h-4" />
-                              {version.author}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Download className="w-4 h-4" />
-                              {version.downloadCount} téléchargements
-                            </div>
-                          </div>
-
-                          {/* Changements */}
+                  {/* Contenu de la version */}
+                  <Card className="flex-1">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* En-tête */}
+                        <div className="flex items-start justify-between">
                           <div>
-                            <h4 className="font-medium text-sm mb-2">Modifications apportées :</h4>
-                            <ul className="space-y-1">
-                              {version.changes.map((change, changeIndex) => (
-                                <li key={changeIndex} className="flex items-start gap-2 text-sm text-gray-600">
-                                  <ArrowRight className="w-3 h-3 mt-1 text-blue-500 flex-shrink-0" />
-                                  {change}
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold text-lg">{version.version}</span>
+                              <Badge className={getStatusColor(version.status)}>
+                                {version.status === 'active' ? 'Version actuelle' : 
+                                 version.status === 'archived' ? 'Archivée' : 'Brouillon'}
+                              </Badge>
+                              <Badge className={getTypeColor(version.type)}>
+                                {version.category}
+                              </Badge>
+                            </div>
+                            <h3 className="font-medium text-base">{version.title}</h3>
+                            {version.description && (
+                              <p className="text-sm text-gray-600">{version.description}</p>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="w-4 h-4 mr-1" />
+                              Consulter
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Download className="w-4 h-4 mr-1" />
+                              Télécharger
+                            </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+
+                        {/* Métadonnées */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {version.publishDate}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <User className="w-4 h-4" />
+                            {version.author}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Download className="w-4 h-4" />
+                            {version.downloadCount} téléchargements
+                          </div>
+                        </div>
+
+                        {/* Changements */}
+                        <div>
+                          <h4 className="font-medium text-sm mb-2">Modifications apportées :</h4>
+                          <ul className="space-y-1">
+                            {version.changes.map((change, changeIndex) => (
+                              <li key={changeIndex} className="flex items-start gap-2 text-sm text-gray-600">
+                                <ArrowRight className="w-3 h-3 mt-1 text-blue-500 flex-shrink-0" />
+                                {change}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Pagination */}
       <div className="mt-6">
