@@ -3,6 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, Quote } from 'lucide-react';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function LegalTextsTestimonials() {
   const testimonials = [
@@ -35,6 +37,17 @@ export function LegalTextsTestimonials() {
     }
   ];
 
+  // Pagination
+  const {
+    currentData: paginatedTestimonials,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({ data: testimonials, itemsPerPage: 3 });
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -48,7 +61,7 @@ export function LegalTextsTestimonials() {
     <div className="space-y-4">
       <h3 className="text-xl font-semibold text-gray-900">Témoignages récents</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {testimonials.map((testimonial) => (
+        {paginatedTestimonials.map((testimonial) => (
           <Card key={testimonial.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -73,6 +86,16 @@ export function LegalTextsTestimonials() {
             </CardContent>
           </Card>
         ))}
+      </div>
+      <div className="mt-6">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
       </div>
     </div>
   );
