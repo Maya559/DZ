@@ -16,6 +16,8 @@ import {
   Clock
 } from 'lucide-react';
 import { buttonHandlers } from '@/utils/buttonUtils';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface LibraryItem {
   id: number;
@@ -78,6 +80,20 @@ export function LibrarySection() {
     return matchesSearch && matchesType;
   });
 
+  // Pagination pour les éléments de la bibliothèque
+  const {
+    currentData: paginatedItems,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredItems,
+    itemsPerPage: 8
+  });
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'livre': return <BookOpen className="w-4 h-4" />;
@@ -129,8 +145,9 @@ export function LibrarySection() {
         </TabsList>
 
         <TabsContent value={selectedType} className="space-y-4 mt-6">
+          {/* Liste des éléments avec pagination */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
+            {paginatedItems.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -190,6 +207,18 @@ export function LibrarySection() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
 
           {filteredItems.length === 0 && (

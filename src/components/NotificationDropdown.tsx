@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Bell, FileText, AlertTriangle, Calendar, ExternalLink } from "lucide-react";
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +43,20 @@ export function NotificationDropdown() {
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
+  // Pagination pour les notifications
+  const {
+    currentData: paginatedNotifications,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: notifications,
+    itemsPerPage: 5
+  });
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -62,14 +78,13 @@ export function NotificationDropdown() {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="max-h-96 overflow-y-auto">
-              {notifications.map((notification) => (
-                <div
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {paginatedNotifications.map((notification) => (
+                <Card 
                   key={notification.id}
-                  className={`
-                    p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors
-                    ${notification.unread ? 'bg-blue-50' : ''}
-                  `}
+                  className={`cursor-pointer hover:bg-gray-50 transition-colors ${
+                    notification.unread ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`
@@ -97,9 +112,23 @@ export function NotificationDropdown() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-4 pt-4 border-t">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                />
+              </div>
+            )}
             <div className="p-4 border-t border-gray-100">
               <Button 
                 variant="ghost" 
