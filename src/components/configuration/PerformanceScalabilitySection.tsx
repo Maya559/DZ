@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Cloud, 
   Server, 
@@ -63,6 +65,20 @@ export function PerformanceScalabilitySection({ language = "fr" }: PerformanceSc
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Pagination pour les microservices
+  const {
+    currentData: paginatedMicroservices,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: microservices,
+    itemsPerPage: 5
+  });
 
   return (
     <div className="space-y-6">
@@ -223,7 +239,7 @@ export function PerformanceScalabilitySection({ language = "fr" }: PerformanceSc
 
         <TabsContent value="microservices" className="space-y-4">
           <div className="space-y-4">
-            {microservices.map((service, index) => (
+            {paginatedMicroservices.map((service, index) => (
               <Card key={index}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between mb-4">
@@ -274,6 +290,16 @@ export function PerformanceScalabilitySection({ language = "fr" }: PerformanceSc
                 </CardContent>
               </Card>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
         </TabsContent>
 
