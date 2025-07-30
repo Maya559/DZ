@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Shield, 
   Lock, 
@@ -82,6 +84,34 @@ export function AdvancedSecurityTab({ language = "fr" }: AdvancedSecurityTabProp
       default: return 'text-gray-600';
     }
   };
+
+  // Pagination pour l'audit trail
+  const {
+    currentData: paginatedAuditTrail,
+    currentPage: auditCurrentPage,
+    totalPages: auditTotalPages,
+    itemsPerPage: auditItemsPerPage,
+    totalItems: auditTotalItems,
+    setCurrentPage: setAuditCurrentPage,
+    setItemsPerPage: setAuditItemsPerPage
+  } = usePagination({
+    data: auditTrailData,
+    itemsPerPage: 4
+  });
+
+  // Pagination pour les anomalies comportementales
+  const {
+    currentData: paginatedAnomalies,
+    currentPage: anomaliesCurrentPage,
+    totalPages: anomaliesTotalPages,
+    itemsPerPage: anomaliesItemsPerPage,
+    totalItems: anomaliesTotalItems,
+    setCurrentPage: setAnomaliesCurrentPage,
+    setItemsPerPage: setAnomaliesItemsPerPage
+  } = usePagination({
+    data: behavioralAnomalies,
+    itemsPerPage: 3
+  });
 
   return (
     <div className="space-y-6">
@@ -204,7 +234,7 @@ export function AdvancedSecurityTab({ language = "fr" }: AdvancedSecurityTabProp
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {auditTrailData.map((entry, index) => (
+            {paginatedAuditTrail.map((entry, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Clock className="w-4 h-4 text-gray-500" />
@@ -223,6 +253,16 @@ export function AdvancedSecurityTab({ language = "fr" }: AdvancedSecurityTabProp
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={auditCurrentPage}
+              totalPages={auditTotalPages}
+              totalItems={auditTotalItems}
+              itemsPerPage={auditItemsPerPage}
+              onPageChange={setAuditCurrentPage}
+              onItemsPerPageChange={setAuditItemsPerPage}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" size="sm">Exporter audit</Button>
@@ -250,7 +290,7 @@ export function AdvancedSecurityTab({ language = "fr" }: AdvancedSecurityTabProp
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {behavioralAnomalies.map((anomaly, index) => (
+            {paginatedAnomalies.map((anomaly, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <AlertTriangle className={`w-4 h-4 ${getRiskColor(anomaly.severity)}`} />
@@ -269,6 +309,16 @@ export function AdvancedSecurityTab({ language = "fr" }: AdvancedSecurityTabProp
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={anomaliesCurrentPage}
+              totalPages={anomaliesTotalPages}
+              totalItems={anomaliesTotalItems}
+              itemsPerPage={anomaliesItemsPerPage}
+              onPageChange={setAnomaliesCurrentPage}
+              onItemsPerPageChange={setAnomaliesItemsPerPage}
+            />
           </div>
           <div className="flex gap-2 mt-4">
             <Button variant="outline" size="sm">Configurer seuils</Button>
