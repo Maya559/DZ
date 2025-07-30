@@ -1,5 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Activity } from 'lucide-react';
 
 interface ActivityHeatmapProps {
@@ -38,6 +40,20 @@ export function ActivityHeatmap({ period }: ActivityHeatmapProps) {
     { action: 'Création d\'alertes', count: 423, percentage: 12 },
     { action: 'Partage de documents', count: 356, percentage: 10 }
   ];
+
+  // Pagination pour les activités
+  const {
+    currentData: paginatedActivities,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: topActivities,
+    itemsPerPage: 3
+  });
 
   return (
     <div className="space-y-6">
@@ -104,7 +120,7 @@ export function ActivityHeatmap({ period }: ActivityHeatmapProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {topActivities.map((activity, index) => (
+            {paginatedActivities.map((activity, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
@@ -121,6 +137,18 @@ export function ActivityHeatmap({ period }: ActivityHeatmapProps) {
               </div>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
