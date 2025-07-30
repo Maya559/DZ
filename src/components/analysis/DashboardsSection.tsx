@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { NewDashboardModal } from '@/components/modals/NewDashboardModal';
 import {
   BarChart3,
@@ -71,6 +73,20 @@ export function DashboardsSection() {
     dashboard.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
     dashboard.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Pagination pour les tableaux de bord
+  const {
+    currentData: paginatedDashboards,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: filteredDashboards,
+    itemsPerPage: 6
+  });
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -168,7 +184,7 @@ export function DashboardsSection() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
-          {filteredDashboards.map((dashboard) => (
+          {paginatedDashboards.map((dashboard) => (
             <Card key={dashboard.id} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
@@ -230,6 +246,18 @@ export function DashboardsSection() {
               </CardContent>
             </Card>
           ))}
+          {totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            </div>
+          )}
         </TabsContent>
 
       </Tabs>
