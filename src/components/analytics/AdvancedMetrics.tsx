@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   DollarSign, 
   AlertCircle, 
@@ -131,6 +133,48 @@ export function AdvancedMetrics() {
       default: return "text-red-600 bg-red-50";
     }
   };
+
+  // Pagination pour les scores de criticité
+  const {
+    currentData: paginatedCriticalityScores,
+    currentPage: criticalityPage,
+    totalPages: criticalityTotalPages,
+    itemsPerPage: criticalityItemsPerPage,
+    totalItems: criticalityTotalItems,
+    setCurrentPage: setCriticalityPage,
+    setItemsPerPage: setCriticalityItemsPerPage
+  } = usePagination({
+    data: criticalityScores,
+    itemsPerPage: 4
+  });
+
+  // Pagination pour la heatmap de risques
+  const {
+    currentData: paginatedRiskHeatmap,
+    currentPage: riskPage,
+    totalPages: riskTotalPages,
+    itemsPerPage: riskItemsPerPage,
+    totalItems: riskTotalItems,
+    setCurrentPage: setRiskPage,
+    setItemsPerPage: setRiskItemsPerPage
+  } = usePagination({
+    data: riskHeatmapData,
+    itemsPerPage: 4
+  });
+
+  // Pagination pour le benchmarking
+  const {
+    currentData: paginatedBenchmarking,
+    currentPage: benchmarkPage,
+    totalPages: benchmarkTotalPages,
+    itemsPerPage: benchmarkItemsPerPage,
+    totalItems: benchmarkTotalItems,
+    setCurrentPage: setBenchmarkPage,
+    setItemsPerPage: setBenchmarkItemsPerPage
+  } = usePagination({
+    data: benchmarkingData,
+    itemsPerPage: 3
+  });
 
   return (
     <div className="space-y-6">
@@ -272,7 +316,7 @@ export function AdvancedMetrics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {criticalityScores.map((item, index) => (
+                {paginatedCriticalityScores.map((item, index) => (
                   <Card key={index} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
@@ -369,7 +413,7 @@ export function AdvancedMetrics() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {riskHeatmapData.map((item, index) => (
+                {paginatedRiskHeatmap.map((item, index) => (
                   <Card key={index} className={`border-l-4 ${
                     item.risk >= 80 ? 'border-l-red-500' :
                     item.risk >= 60 ? 'border-l-orange-500' :
@@ -454,7 +498,7 @@ export function AdvancedMetrics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {benchmarkingData.map((item, index) => (
+                {paginatedBenchmarking.map((item, index) => (
                   <Card key={index} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
@@ -512,6 +556,18 @@ export function AdvancedMetrics() {
                   </Card>
                 ))}
               </div>
+              {benchmarkTotalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={benchmarkPage}
+                    totalPages={benchmarkTotalPages}
+                    totalItems={benchmarkTotalItems}
+                    itemsPerPage={benchmarkItemsPerPage}
+                    onPageChange={setBenchmarkPage}
+                    onItemsPerPageChange={setBenchmarkItemsPerPage}
+                  />
+                </div>
+              )}
 
               <Card className="mt-6 bg-gradient-to-r from-blue-50 to-purple-50">
                 <CardContent className="p-6">
