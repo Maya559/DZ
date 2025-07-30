@@ -2,6 +2,8 @@
 import React from 'react';
 import { ActionButtons } from './ActionButtons';
 import { ResourceCard } from './ResourceCard';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { BookOpen } from 'lucide-react';
 
 export function RevuesTab() {
@@ -28,12 +30,26 @@ export function RevuesTab() {
     }
   ];
 
+  // Pagination pour les revues
+  const {
+    currentData: paginatedRevues,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: revues,
+    itemsPerPage: 6
+  });
+
   return (
     <div className="space-y-6">
       <ActionButtons resourceType="revue" />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {revues.map((revue) => (
+        {paginatedRevues.map((revue) => (
           <ResourceCard 
             key={revue.id}
             id={revue.id}
@@ -51,6 +67,18 @@ export function RevuesTab() {
           />
         ))}
       </div>
+      {totalPages > 1 && (
+        <div className="mt-6">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
+        </div>
+      )}
     </div>
   );
 }

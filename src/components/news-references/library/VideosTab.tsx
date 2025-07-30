@@ -2,6 +2,8 @@
 import React from 'react';
 import { ActionButtons } from './ActionButtons';
 import { ResourceCard } from './ResourceCard';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Play } from 'lucide-react';
 
 export function VideosTab() {
@@ -26,12 +28,26 @@ export function VideosTab() {
     }
   ];
 
+  // Pagination pour les vidéos
+  const {
+    currentData: paginatedVideos,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: videos,
+    itemsPerPage: 6
+  });
+
   return (
     <div className="space-y-6">
       <ActionButtons resourceType="video" />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {videos.map((video) => (
+        {paginatedVideos.map((video) => (
           <ResourceCard 
             key={video.id}
             id={video.id}
@@ -48,6 +64,18 @@ export function VideosTab() {
           />
         ))}
       </div>
+      {totalPages > 1 && (
+        <div className="mt-6">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
+        </div>
+      )}
     </div>
   );
 }
