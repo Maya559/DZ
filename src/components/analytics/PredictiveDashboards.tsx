@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Shield, 
   TrendingUp, 
@@ -139,6 +141,62 @@ export function PredictiveDashboards() {
     }
   ];
 
+  // Pagination pour le radar de conformité
+  const {
+    currentData: paginatedComplianceRadar,
+    currentPage: radarPage,
+    totalPages: radarTotalPages,
+    itemsPerPage: radarItemsPerPage,
+    totalItems: radarTotalItems,
+    setCurrentPage: setRadarPage,
+    setItemsPerPage: setRadarItemsPerPage
+  } = usePagination({
+    data: complianceRadarData,
+    itemsPerPage: 4
+  });
+
+  // Pagination pour les tendances
+  const {
+    currentData: paginatedTrends,
+    currentPage: trendsPage,
+    totalPages: trendsTotalPages,
+    itemsPerPage: trendsItemsPerPage,
+    totalItems: trendsTotalItems,
+    setCurrentPage: setTrendsPage,
+    setItemsPerPage: setTrendsItemsPerPage
+  } = usePagination({
+    data: trendsData,
+    itemsPerPage: 3
+  });
+
+  // Pagination pour l'intelligence concurrentielle
+  const {
+    currentData: paginatedCompetitive,
+    currentPage: competitivePage,
+    totalPages: competitiveTotalPages,
+    itemsPerPage: competitiveItemsPerPage,
+    totalItems: competitiveTotalItems,
+    setCurrentPage: setCompetitivePage,
+    setItemsPerPage: setCompetitiveItemsPerPage
+  } = usePagination({
+    data: competitiveIntelligence,
+    itemsPerPage: 3
+  });
+
+  // Pagination pour les évaluations d'impact
+  const {
+    currentData: paginatedImpact,
+    currentPage: impactPage,
+    totalPages: impactTotalPages,
+    itemsPerPage: impactItemsPerPage,
+    totalItems: impactTotalItems,
+    setCurrentPage: setImpactPage,
+    setItemsPerPage: setImpactItemsPerPage
+  } = usePagination({
+    data: impactAssessments,
+    itemsPerPage: 3
+  });
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -181,7 +239,7 @@ export function PredictiveDashboards() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {complianceRadarData.map((item, index) => (
+                {paginatedComplianceRadar.map((item, index) => (
                   <Card key={index} className="border-l-4 border-l-blue-500">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
@@ -240,6 +298,18 @@ export function PredictiveDashboards() {
                   </Card>
                 ))}
               </div>
+              {radarTotalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={radarPage}
+                    totalPages={radarTotalPages}
+                    totalItems={radarTotalItems}
+                    itemsPerPage={radarItemsPerPage}
+                    onPageChange={setRadarPage}
+                    onItemsPerPageChange={setRadarItemsPerPage}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -254,7 +324,7 @@ export function PredictiveDashboards() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {trendsData.map((trend, index) => (
+                {paginatedTrends.map((trend, index) => (
                   <Card key={index} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
@@ -299,6 +369,18 @@ export function PredictiveDashboards() {
                   </Card>
                 ))}
               </div>
+              {trendsTotalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={trendsPage}
+                    totalPages={trendsTotalPages}
+                    totalItems={trendsTotalItems}
+                    itemsPerPage={trendsItemsPerPage}
+                    onPageChange={setTrendsPage}
+                    onItemsPerPageChange={setTrendsItemsPerPage}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -313,7 +395,7 @@ export function PredictiveDashboards() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {competitiveIntelligence.map((sector, index) => (
+                {paginatedCompetitive.map((sector, index) => (
                   <Card key={index} className="border-l-4 border-l-purple-500">
                     <CardHeader>
                       <CardTitle className="text-lg">{sector.sector}</CardTitle>
@@ -352,6 +434,18 @@ export function PredictiveDashboards() {
                   </Card>
                 ))}
               </div>
+              {competitiveTotalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={competitivePage}
+                    totalPages={competitiveTotalPages}
+                    totalItems={competitiveTotalItems}
+                    itemsPerPage={competitiveItemsPerPage}
+                    onPageChange={setCompetitivePage}
+                    onItemsPerPageChange={setCompetitiveItemsPerPage}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -366,7 +460,7 @@ export function PredictiveDashboards() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {impactAssessments.map((assessment, index) => (
+                {paginatedImpact.map((assessment, index) => (
                   <Card key={index} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
@@ -434,6 +528,18 @@ export function PredictiveDashboards() {
                   </Card>
                 ))}
               </div>
+              {impactTotalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={impactPage}
+                    totalPages={impactTotalPages}
+                    totalItems={impactTotalItems}
+                    itemsPerPage={impactItemsPerPage}
+                    onPageChange={setImpactPage}
+                    onItemsPerPageChange={setImpactItemsPerPage}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
