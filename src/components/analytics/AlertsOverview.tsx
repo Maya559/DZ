@@ -2,6 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { Bell, AlertTriangle, Info, CheckCircle, Clock } from 'lucide-react';
 
 export function AlertsOverview() {
@@ -79,6 +81,20 @@ export function AlertsOverview() {
     { label: 'Total ce mois', value: 65, color: 'text-blue-600' }
   ];
 
+  // Pagination pour les alertes
+  const {
+    currentData: paginatedAlerts,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: alerts,
+    itemsPerPage: 4
+  });
+
   return (
     <div className="space-y-6">
       {/* Statistiques des alertes */}
@@ -110,7 +126,7 @@ export function AlertsOverview() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {alerts.map((alert) => (
+            {paginatedAlerts.map((alert) => (
               <div key={alert.id} className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
                 <div className="flex-shrink-0 mt-1">
                   {getAlertIcon(alert.type)}
@@ -134,6 +150,18 @@ export function AlertsOverview() {
               </div>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
