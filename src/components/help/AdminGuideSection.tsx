@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 import { 
   Shield, 
   Users, 
@@ -443,6 +445,32 @@ export function AdminGuideSection() {
     document.body.removeChild(link);
   };
 
+  // Pagination pour les articles de chaque module
+  const getPaginatedArticles = (articles: any[], itemsPerPage: number = 3) => {
+    const {
+      currentData: paginatedArticles,
+      currentPage,
+      totalPages,
+      itemsPerPage: paginationItemsPerPage,
+      totalItems,
+      setCurrentPage,
+      setItemsPerPage
+    } = usePagination({
+      data: articles,
+      itemsPerPage
+    });
+
+    return {
+      paginatedArticles,
+      currentPage,
+      totalPages,
+      itemsPerPage: paginationItemsPerPage,
+      totalItems,
+      setCurrentPage,
+      setItemsPerPage
+    };
+  };
+
 
 
   return (
@@ -570,55 +598,83 @@ export function AdminGuideSection() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {module.articles.map((article) => (
-                      <div key={article.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors group">
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors text-sm">
-                              {article.title}
-                            </h4>
-                          </div>
-                          <p className="text-xs text-gray-600 mb-2">{article.description}</p>
-                          <div className="flex items-center gap-3 text-xs">
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-gray-500" />
-                              <span className="text-gray-500">{article.duration}</span>
+                  {(() => {
+                    const {
+                      paginatedArticles,
+                      currentPage,
+                      totalPages,
+                      itemsPerPage,
+                      totalItems,
+                      setCurrentPage,
+                      setItemsPerPage
+                    } = getPaginatedArticles(module.articles, 3);
+
+                    return (
+                      <>
+                        <div className="space-y-3">
+                          {paginatedArticles.map((article) => (
+                            <div key={article.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors group">
+                              <div className="flex-1">
+                                <div className="flex items-start justify-between mb-2">
+                                  <h4 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors text-sm">
+                                    {article.title}
+                                  </h4>
+                                </div>
+                                <p className="text-xs text-gray-600 mb-2">{article.description}</p>
+                                <div className="flex items-center gap-3 text-xs">
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-gray-500" />
+                                    <span className="text-gray-500">{article.duration}</span>
+                                  </div>
+                                  <Badge className={`text-xs ${getPriorityColor(article.priority)}`}>
+                                    {article.priority}
+                                  </Badge>
+                                  <div className="flex items-center gap-1">
+                                    <Eye className="w-3 h-3 text-gray-500" />
+                                    <span className="text-gray-500">{article.views} vues</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => handlePlayVideo(article)}
+                                >
+                                  <Play className="w-3 h-3" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => {
+                                    console.log('Downloading article');
+                                    window.dispatchEvent(new CustomEvent('download-article', { 
+                                      detail: { articleId: article.id }
+                                    }));
+                                  }}
+                                >
+                                  <Download className="w-3 h-3" />
+                                </Button>
+                                <ChevronRight className="w-4 h-4 text-gray-400" />
+                              </div>
                             </div>
-                            <Badge className={`text-xs ${getPriorityColor(article.priority)}`}>
-                              {article.priority}
-                            </Badge>
-                            <div className="flex items-center gap-1">
-                              <Eye className="w-3 h-3 text-gray-500" />
-                              <span className="text-gray-500">{article.views} vues</span>
-                            </div>
+                          ))}
+                        </div>
+                        {totalPages > 1 && (
+                          <div className="mt-4">
+                            <Pagination
+                              currentPage={currentPage}
+                              totalPages={totalPages}
+                              totalItems={totalItems}
+                              itemsPerPage={itemsPerPage}
+                              onPageChange={setCurrentPage}
+                              onItemsPerPageChange={setItemsPerPage}
+                            />
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => handlePlayVideo(article)}
-                          >
-                            <Play className="w-3 h-3" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => {
-                              console.log('Downloading article');
-                              window.dispatchEvent(new CustomEvent('download-article', { 
-                                detail: { articleId: article.id }
-                              }));
-                            }}
-                          >
-                            <Download className="w-3 h-3" />
-                          </Button>
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             ))}
