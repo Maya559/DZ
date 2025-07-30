@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Shield, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Pagination } from '@/components/common/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 interface ComplianceMetricsProps {
   period: string;
@@ -24,6 +26,34 @@ export function ComplianceMetrics({ period, detailed = false }: ComplianceMetric
     { domain: 'Droit environnemental', conforme: 87, nonConforme: 13 },
     { domain: 'Droit social', conforme: 96, nonConforme: 4 }
   ];
+
+  // Pagination pour les données de conformité
+  const {
+    currentData: paginatedComplianceData,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    totalItems,
+    setCurrentPage,
+    setItemsPerPage
+  } = usePagination({
+    data: complianceData,
+    itemsPerPage: 3
+  });
+
+  // Pagination pour les domaines de conformité
+  const {
+    currentData: paginatedComplianceByDomain,
+    currentPage: domainPage,
+    totalPages: domainTotalPages,
+    itemsPerPage: domainItemsPerPage,
+    totalItems: domainTotalItems,
+    setCurrentPage: setDomainPage,
+    setItemsPerPage: setDomainItemsPerPage
+  } = usePagination({
+    data: complianceByDomain,
+    itemsPerPage: 3
+  });
 
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: Record<string, unknown>) => {
@@ -103,7 +133,7 @@ export function ComplianceMetrics({ period, detailed = false }: ComplianceMetric
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {complianceData.map((item, index) => (
+          {paginatedComplianceData.map((item, index) => (
             <Card key={index}>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
@@ -121,6 +151,18 @@ export function ComplianceMetrics({ period, detailed = false }: ComplianceMetric
             </Card>
           ))}
         </div>
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -159,7 +201,7 @@ export function ComplianceMetrics({ period, detailed = false }: ComplianceMetric
           </div>
           
           <div className="flex flex-wrap justify-center gap-4">
-            {complianceData.map((item, index) => (
+            {paginatedComplianceData.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div 
                   className="w-3 h-3 rounded-full" 
@@ -169,6 +211,18 @@ export function ComplianceMetrics({ period, detailed = false }: ComplianceMetric
               </div>
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
